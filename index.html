@@ -1455,7 +1455,7 @@ const CSEC=[
  {k:'mobile',ic:'📱',t:'Mobile uniquement',d:'La boutique n’est accessible que depuis un mobile',tg:1}]},
 {id:'fd',ic:'🏆',bg:'#4a3a12',t:'Fidélité et jeux',items:[
  {k:'rank',ic:'🏅',t:'Rang',d:'Rangs de fidélité et réductions automatiques',tg:1,def:1,f:[{n:'lv',l:'Rangs (un par ligne : nom | points nécessaires | remise %)',t:'lines',d:'Bronze | 0 | 0\nArgent | 100 | 3\nOr | 250 | 5\nDiamant | 500 | 8'}]},
- {k:'wheel',ic:'🎡',t:'Roue de la fortune',d:'Mini-jeu : les clients gagnent des lots à chaque spin',tg:1,f:[{n:'lots',l:'Lots (un par ligne : lot | chance)',t:'lines',d:'−5 % | 30\n−10 % | 10\nLivraison offerte | 15\nPerdu | 45'},{n:'cd',l:'Un spin tous les … jours',t:'num',d:1}]},
+ {k:'wheel',ic:'🎡',t:'Roue de la fortune',d:'Mini-jeu : les clients gagnent des lots à chaque spin',tg:1,def:1,f:[{n:'lots',l:'Lots (un par ligne : lot | chance)',t:'lines',d:'−5 % | 30\n−10 % | 10\nLivraison offerte | 15\nPerdu | 45'},{n:'cd',l:'Un spin tous les … jours',t:'num',d:1}]},
  {k:'contest',ic:'🎁',t:'Jeu Concours',d:'Tirage au sort parmi tes clients à une date définie',tg:1,f:[{n:'ti',l:'Titre',t:'text',d:'Grand tirage'},{n:'lot',l:'Lot à gagner',t:'text'},{n:'dt',l:'Date du tirage',t:'date'},{n:'nb',l:'Nombre de gagnants',t:'num',d:1}]},
  {k:'nth',ic:'🔢',t:'Messages Nème client',d:'Le Nème client reçoit un message / une promo',tg:1,f:[{n:'n',l:'N (ex : 10 = un client sur 10)',t:'num',d:10},{n:'msg',l:'Message',t:'ta',d:'Bravo, tu es notre client chanceux ! Voici un code promo.'}]},
  {k:'reviews',ic:'⭐',t:'Avis clients',d:'Demande d’avis après livraison, page « Avis » dans la boutique',tg:1,def:1},
@@ -2111,7 +2111,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='18 oct. · 17h25 · roue de la fortune';
+var APP_V='18 oct. · 17h45 · roue visible';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
