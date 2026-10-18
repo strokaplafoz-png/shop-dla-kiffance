@@ -2111,7 +2111,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='18 oct. · 17h45 · roue visible';
+var APP_V='18 oct. · 18h55 · plus fluide';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -2279,6 +2279,8 @@ nav button.bump span{display:inline-block;animation:cbdBounce .55s}
 @keyframes loyRing{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.4);opacity:0}}
 .loy .st i img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .loy .okt{font-weight:800;margin-bottom:2px}
+/* fluidité : quand une fenêtre (admin, jeux…) est ouverte, tout ce qui bouge derrière est mis en pause */
+body.ovo :not(.ov):not(.ov *):not(.ckov):not(.ckov *){animation-play-state:paused!important}
 .lyd{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px dashed rgba(255,255,255,.35);margin:2px;vertical-align:middle}
 .lyd.f{border:2px solid var(--glow);background:rgba(var(--mrgb),.55)}
 .lyb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -2505,6 +2507,9 @@ nav button.bump span{display:inline-block;animation:cbdBounce .55s}
   if(!ok){t.disabled=false;return}
   var L=await lyLoad();if(L){window.__lyL=L;var l=document.getElementById('lyl'),q=document.getElementById('lyq');if(l)l.innerHTML=lyRows(L,q?q.value:'')}
   toast('Carte mise à jour ✓')},true);
+ /* fluidité : met en pause les animations de fond quand une fenêtre est ouverte */
+ try{var _ovT=0,ovUpd=function(){_ovT=0;try{document.body.classList.toggle('ovo',!!document.querySelector('.ov.show,.ckov.show'))}catch(e){}};
+  new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var t=ms[i].target;if(t&&t.classList&&(t.classList.contains('ov')||t.classList.contains('ckov'))){if(!_ovT)_ovT=setTimeout(ovUpd,0);return}}}).observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true});ovUpd()}catch(e){}
  var _onL=ocNote;ocNote=function(){var r=_onL.apply(this,arguments);try{var c=loyCfg();if(c.on&&S.loyUse&&loyAvail()>0)r+='\n[FIDÉLITÉ] 🎁 '+c.r+' à ajouter (carte de fidélité, '+c.n+' commandes)'}catch(e){}return r};
  var _rdL=render;render=function(){try{if(S.loyUse&&S.orders.length>(S.loyBase==null?S.orders.length:S.loyBase)){if(!loyRem())S.loyUsed=(S.loyUsed||0)+1;LRts=0;S.loyUse=false;save()}}catch(e){}return _rdL.apply(this,arguments)};
  try{var sl=CSEC.find(function(x){return x.id==='fd'});if(sl&&!sl.items.some(function(i){return i.k==='loy'}))sl.items.unshift({k:'loy',tg:1,def:1,ic:'🎟️',t:'Carte de fidélité',d:'Après un certain nombre de commandes, le client gagne une récompense (ex. 1 g offert). Affichée sur le profil et dans le panier. Compte les commandes envoyées depuis le téléphone du client.',f:[{n:'n',l:'Nombre de commandes pour la récompense',t:'num',d:10},{n:'r',l:'Récompense',d:'1 g offert'}]})}catch(e){}
