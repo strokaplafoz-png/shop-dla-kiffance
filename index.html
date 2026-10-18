@@ -2111,7 +2111,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='18 oct. · 18h55 · plus fluide';
+var APP_V='18 oct. · 19h50 · mode léger';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -2281,6 +2281,9 @@ nav button.bump span{display:inline-block;animation:cbdBounce .55s}
 .loy .okt{font-weight:800;margin-bottom:2px}
 /* fluidité : quand une fenêtre (admin, jeux…) est ouverte, tout ce qui bouge derrière est mis en pause */
 body.ovo :not(.ov):not(.ov *):not(.ckov):not(.ckov *){animation-play-state:paused!important}
+/* mode léger (Telegram Desktop ou ?lite=1) : pas de flou en arrière-plan, animations de fond arrêtées */
+body.lite *,body.lite *::before,body.lite *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+body.lite :not(.ov):not(.ov *):not(.ckov):not(.ckov *){animation-iteration-count:1!important}
 .lyd{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px dashed rgba(255,255,255,.35);margin:2px;vertical-align:middle}
 .lyd.f{border:2px solid var(--glow);background:rgba(var(--mrgb),.55)}
 .lyb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -2510,6 +2513,27 @@ body.ovo :not(.ov):not(.ov *):not(.ckov):not(.ckov *){animation-play-state:pause
  /* fluidité : met en pause les animations de fond quand une fenêtre est ouverte */
  try{var _ovT=0,ovUpd=function(){_ovT=0;try{document.body.classList.toggle('ovo',!!document.querySelector('.ov.show,.ckov.show'))}catch(e){}};
   new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var t=ms[i].target;if(t&&t.classList&&(t.classList.contains('ov')||t.classList.contains('ckov'))){if(!_ovT)_ovT=setTimeout(ovUpd,0);return}}}).observe(document.body,{attributes:true,attributeFilter:['class'],subtree:true});ovUpd()}catch(e){}
+ /* ===== DIAGNOSTIC (ouvre la boutique avec ?diag=1 à la fin de l'adresse) : fps, erreurs, requêtes lentes ===== */
+ try{if(/[?&]diag(=|&|$)/.test(location.search)){
+  var DG={err:[],lt:[],res:[],fps:0,fpsMin:999};
+  window.addEventListener('error',function(e){DG.err.push((e.message||'erreur')+' @'+String(e.filename||'').split('/').pop()+':'+(e.lineno||''))});
+  window.addEventListener('unhandledrejection',function(e){DG.err.push('promesse: '+String((e.reason&&e.reason.message)||e.reason).slice(0,120))});
+  try{new PerformanceObserver(function(l){l.getEntries().forEach(function(x){DG.lt.push(Math.round(x.duration)+'ms@'+Math.round(x.startTime/100)/10+'s')})}).observe({entryTypes:['longtask']})}catch(e){}
+  try{new PerformanceObserver(function(l){l.getEntries().forEach(function(x){var st=x.responseStatus||0;if(x.duration>1200||st>=400||(x.transferSize===0&&x.decodedBodySize===0&&st!==0&&st>=400))DG.res.push(Math.round(x.duration)+'ms '+(st||'?')+' '+String(x.name).replace(/^https?:\/\//,'').slice(0,70))})}).observe({entryTypes:['resource']})}catch(e){}
+  var box=document.createElement('div');box.style.cssText='position:fixed;top:4px;right:4px;z-index:99999;max-width:330px;max-height:70vh;overflow:auto;background:#000d;color:#9f9;font:11px/1.35 monospace;padding:8px;border:1px solid #4f4;border-radius:8px;white-space:pre-wrap';document.body.appendChild(box);
+  var n=0,t0=performance.now();(function f(){n++;var t=performance.now();if(t-t0>=1000){DG.fps=Math.round(n*1000/(t-t0));if(DG.fps<DG.fpsMin)DG.fpsMin=DG.fps;n=0;t0=t}requestAnimationFrame(f)})();
+  function rep(){var a=0,inf=0;try{document.getAnimations().forEach(function(x){a++;try{if(x.effect.getComputedTiming().iterations===Infinity)inf++}catch(e){}})}catch(e){}
+   return 'DIAG v.'+(window.APP_V||'?')+'\nfps: '+DG.fps+' (min '+DG.fpsMin+')\nanimations: '+a+' (infinies '+inf+')\néléments DOM: '+document.querySelectorAll('*').length+'\nplateforme Telegram: '+(window.__TGPF||'(aucune)')+' | mode léger: '+(window.__LITE?'OUI':'non')+'\nfenêtre ouverte: '+(document.body.classList.contains('ovo')?'oui':'non')+'\nsupabase: '+((typeof sb!=='undefined'&&sb)?'connecté':'NON')+'\nnavigateur: '+navigator.userAgent.slice(0,110)+'\ncœurs: '+(navigator.hardwareConcurrency||'?')+' | mémoire: '+(navigator.deviceMemory||'?')+' Go\nerreurs JS ('+DG.err.length+'):\n'+DG.err.slice(-6).join('\n')+'\ntâches longues ('+DG.lt.length+'): '+DG.lt.slice(-8).join(', ')+'\nrequêtes lentes/échouées ('+DG.res.length+'):\n'+DG.res.slice(-6).join('\n')}
+  var out=document.createElement('div'),bt=document.createElement('button');bt.textContent='📋 Copier ce rapport';bt.style.cssText='margin-top:6px;padding:6px 10px;font-size:12px';
+  bt.onclick=function(){var t=rep();try{navigator.clipboard.writeText(t).then(function(){bt.textContent='✅ Copié'},function(){bt.textContent='Sélectionne le texte et copie-le'})}catch(e){bt.textContent='Sélectionne le texte et copie-le'}};
+  box.appendChild(out);box.appendChild(bt);setInterval(function(){out.textContent=rep()},1000)}}catch(e){}
+ /* mode léger automatique sur Telegram Desktop (webview sans accélération graphique) ; ?lite=1 force, ?lite=0 désactive */
+ var LITE=false;try{var pf='';try{pf=String((window.Telegram&&Telegram.WebApp&&Telegram.WebApp.platform)||'')}catch(e){}
+  var q=location.search,sv='';try{sv=localStorage.getItem('skf_lite')||''}catch(e){}
+  if(/[?&]lite=0/.test(q)){LITE=false;try{localStorage.setItem('skf_lite','0')}catch(e){}}
+  else if(/[?&]lite=1/.test(q)){LITE=true;try{localStorage.setItem('skf_lite','1')}catch(e){}}
+  else if(sv==='1')LITE=true;else if(sv==='0')LITE=false;else LITE=(pf==='tdesktop');
+  window.__LITE=LITE;window.__TGPF=pf;if(LITE)document.body.classList.add('lite')}catch(e){}
  var _onL=ocNote;ocNote=function(){var r=_onL.apply(this,arguments);try{var c=loyCfg();if(c.on&&S.loyUse&&loyAvail()>0)r+='\n[FIDÉLITÉ] 🎁 '+c.r+' à ajouter (carte de fidélité, '+c.n+' commandes)'}catch(e){}return r};
  var _rdL=render;render=function(){try{if(S.loyUse&&S.orders.length>(S.loyBase==null?S.orders.length:S.loyBase)){if(!loyRem())S.loyUsed=(S.loyUsed||0)+1;LRts=0;S.loyUse=false;save()}}catch(e){}return _rdL.apply(this,arguments)};
  try{var sl=CSEC.find(function(x){return x.id==='fd'});if(sl&&!sl.items.some(function(i){return i.k==='loy'}))sl.items.unshift({k:'loy',tg:1,def:1,ic:'🎟️',t:'Carte de fidélité',d:'Après un certain nombre de commandes, le client gagne une récompense (ex. 1 g offert). Affichée sur le profil et dans le panier. Compte les commandes envoyées depuis le téléphone du client.',f:[{n:'n',l:'Nombre de commandes pour la récompense',t:'num',d:10},{n:'r',l:'Récompense',d:'1 g offert'}]})}catch(e){}
