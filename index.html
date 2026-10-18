@@ -2111,7 +2111,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='18 oct. · 21h40 · drapeaux';
+var APP_V='18 oct. · 22h55 · barre drapeaux v2';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -2571,6 +2571,7 @@ body.stk-edit #fab{display:none!important}
 .emog .it b{position:absolute;right:-4px;top:-4px;width:24px;height:24px;border-radius:50%;background:#c0262b;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;border:0}
 img.cemo{height:1.3em;width:auto;max-width:2.6em;vertical-align:-.3em;display:inline-block;margin:0 .06em;object-fit:contain;filter:none!important;pointer-events:none}
 #emobar{position:fixed;left:0;right:0;top:0;z-index:600;display:flex;gap:6px;align-items:center;overflow-x:auto;padding:8px 10px;background:rgba(6,14,10,.96);border-bottom:1px solid var(--glow);color:#fff;font:12px system-ui,sans-serif}
+#emobar[hidden]{display:none!important}
 #emobar button{flex:0 0 auto;width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);padding:3px}
 #emobar button img{width:100%;height:100%;object-fit:contain;pointer-events:none}
 </style>
@@ -2745,13 +2746,17 @@ img.cemo{height:1.3em;width:auto;max-width:2.6em;vertical-align:-.3em;display:in
  /* barre d'insertion au-dessus des champs de texte de l'admin */
  var EF=null,EBT=0;
  function emoBarShow(t){var L=allEmo();if(!L.length)return;EF=t;var b=document.getElementById('emobar');if(!b){b=document.createElement('div');b.id='emobar';document.body.appendChild(b)}
-  b.innerHTML=L.map(function(e){return '<button type="button" data-emoins="'+esc(e.n)+'"><img src="'+esc(e.u)+'" alt=""></button>'}).join('');b.hidden=false}
- function emoBarHide(){var b=document.getElementById('emobar');if(b)b.hidden=true}
+  b.innerHTML='<button type="button" data-emoclose style="width:34px;color:#fff;font-size:18px">✕</button>'+L.map(function(e){return '<button type="button" data-emoins="'+esc(e.n)+'"><img src="'+esc(e.u)+'" alt=""></button>'}).join('');b.hidden=false}
+ function emoBarHide(){var b=document.getElementById('emobar');if(b)b.hidden=true;EF=null}
+ function emoTxt(t){return !!(t&&t.matches&&t.matches('input[type=text],input:not([type]),input[type=search],textarea')&&t.closest&&t.closest('#aS,#pS'))}
+ setInterval(function(){var b=document.getElementById('emobar');if(!b||b.hidden)return;var a=document.activeElement;if(!emoTxt(a)||!a.offsetParent)emoBarHide()},500);
+ ['click','touchend','pointerdown'].forEach(function(ev){document.addEventListener(ev,function(e){var b=document.getElementById('emobar');if(!b||b.hidden)return;var t=e.target;if(t&&t.closest&&(t.closest('#emobar')||emoTxt(t)))return;emoBarHide()},true)});
  document.addEventListener('focusin',function(e){var t=e.target;clearTimeout(EBT);if(t&&t.matches&&t.matches('input[type=text],input:not([type]),input[type=search],textarea')&&t.closest&&t.closest('#aS,#pS'))emoBarShow(t);else if(!(t&&t.closest&&t.closest('#emobar')))emoBarHide()},true);
  document.addEventListener('focusout',function(){clearTimeout(EBT);EBT=setTimeout(emoBarHide,300)},true);
  document.addEventListener('mousedown',function(e){if(e.target.closest&&e.target.closest('#emobar'))e.preventDefault()},true);
  document.addEventListener('touchstart',function(e){if(e.target.closest&&e.target.closest('#emobar'))e.preventDefault()},{capture:true,passive:false});
- document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-emoins],[data-emoadd],[data-emodel],[data-emocp]');if(!t)return;var d=t.dataset;e.preventDefault();e.stopPropagation();
+ document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-emoins],[data-emoadd],[data-emodel],[data-emocp],[data-emoclose]');if(!t)return;var d=t.dataset;e.preventDefault();e.stopPropagation();
+  if(d.emoclose!==undefined){emoBarHide();try{document.activeElement.blur()}catch(x){}return}
   if(d.emoins!==undefined){var f=EF;if(!f)return;var c=':'+d.emoins+':',a=f.selectionStart==null?f.value.length:f.selectionStart,z=f.selectionEnd==null?a:f.selectionEnd;f.focus();try{f.setRangeText(c,a,z,'end')}catch(x){f.value=f.value.slice(0,a)+c+f.value.slice(z)}f.dispatchEvent(new Event('input',{bubbles:true}));f.dispatchEvent(new Event('change',{bubbles:true}));return}
   if(d.emoadd!==undefined){if(elist().length>=EMAX)return toast('Maximum '+EMAX+' émoticônes.');EMO=true;fi.click();return}
   if(d.emodel!==undefined){esetList(elist().filter(function(x){return x.n!==d.emodel}));emoForm();return}
