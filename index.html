@@ -2111,7 +2111,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='19 oct. · 20h30 · visiteurs + machine';
+var APP_V='19 oct. · 20h55 · visiteurs + machine';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3565,7 +3565,9 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
  function pick(P){var t=P.reduce(function(a,x){return a+x.w},0),x=RND()*t,i;for(i=0;i<P.length;i++){x-=P[i].w;if(x<0)return i}return 0}
  function allowed(){var c=C();try{var last=S.play&&S.play.L;if(!last)return true;return(Date.parse(today())-Date.parse(last))/864e5>=c.cd}catch(e){return true}}
  function norm(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
- function prod(p){var u=(p.ph&&p.ph[0])||'';if(u&&typeof u!=='string')u=u.url||u.u||'';if(typeof u==='string'&&/^(https?:|data:image|\/)/.test(u))return{k:'p:'+p.id,h:'<img src="'+esc(u)+'" alt="">'};if(p.e)return{k:'e:'+p.e,h:esc(p.e)};return{k:'p:'+p.id,h:'🎁'}}
+ function isV(u){try{return typeof isVid==='function'?!!isVid(u):/\.(mp4|mov|m4v|webm)(\?|$)/i.test(u)}catch(e){return false}}
+ function prod(p){var u='',L=p.ph||[],i,c;for(i=0;i<L.length;i++){c=L[i];if(c&&typeof c!=='string')c=c.url||c.u||'';if(typeof c==='string'&&c&&!isV(c)&&/^(https?:|data:image|\/)/.test(c)){u=c;break}}
+  if(u)return{k:'p:'+p.id,h:'<img src="'+esc(u)+'" alt="" decoding="async">'};if(p.e)return{k:'e:'+p.e,h:esc(p.e)};return{k:'p:'+p.id,h:'🎁'}}
  function symOf(str){str=String(str||'').trim();if(!str)return null;var q=norm(str),p=null;try{p=products.find(function(x){return norm(x.n)===q})||products.find(function(x){return norm(x.n).indexOf(q)>=0})}catch(e){}if(p)return prod(p);return{k:'t:'+str,h:esc(Array.from(str).slice(0,3).join(''))}}
  /* symboles + lots : chaque lot gagnant a son produit */
  function setup(){var P=pool(),list=[],seen={};function add(o){if(o&&!seen[o.k]){seen[o.k]=1;list.push(o)}return o}
@@ -3600,7 +3602,7 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
   o.innerHTML='<div class="sheet"><button class="x" data-close>✕</button><h2 id="slt">🎰</h2><p class="note" style="margin:0">Appuie sur « Lancer » : 3 symboles identiques = un cadeau !</p><div class="slhud"><span>Lancers <b id="sltr">1</b></span><button id="slsnd" aria-label="Son">🔊</button></div><div class="slm" id="slm"><div class="slr"><div class="slw"><div class="sls"></div><div class="slln"></div></div><div class="slw"><div class="sls"></div><div class="slln"></div></div><div class="slw"><div class="sls"></div><div class="slln"></div></div></div><button id="slgo">🎰 Lancer !</button><div id="sls2" class="hid"></div></div><div class="res" id="slr2"></div><button class="btn alt" id="sladm" style="display:none">🧪 Test admin (sans lot, illimité)</button><p class="note" id="sln"></p></div>';
   document.body.appendChild(o);o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('show')});return o}
  function ov(h){var s=document.getElementById('sls2');if(!s)return;if(!h){s.className='hid';s.innerHTML='';return}s.className='';s.innerHTML=h}
- function strip(i,items,off){var s=document.querySelectorAll('#ovSL .sls')[i];s.style.transition='none';s.style.transform='translateY('+(off||0)+'px)';s.innerHTML=items.map(function(e){return'<i>'+e.h+'</i>'}).join('')}
+ function strip(i,items,off){var s=document.querySelectorAll('#ovSL .sls')[i];s.style.transition='none';s.style.transform='translateY('+(off||0)+'px)';s.textContent='';var fr=document.createDocumentFragment();items.forEach(function(e){if(!e._n){var n=document.createElement('i');n.innerHTML=e.h;e._n=n}fr.appendChild(e._n.cloneNode(true))});s.appendChild(fr)}
  function open(){var c=C(),o=build();SY=setup().SY;o.classList.add('show');
   document.getElementById('slt').textContent='🎰 '+T(c.title);
   var adm=document.getElementById('sladm');adm.style.display=(typeof IS_ADMIN!=='undefined'&&IS_ADMIN)?'block':'none';adm.onclick=function(){begin(true)};
