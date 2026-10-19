@@ -2111,7 +2111,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='19 oct. · 01h26 · chat chiffré';
+var APP_V='19 oct. · 02h34 · chat chiffré';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3212,7 +3212,8 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
 .chf .chcam,.chf .chsd{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--bd,#23376e);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--tx)}
 .chf .chsd{background:linear-gradient(135deg,var(--blue),var(--glow));color:var(--on,#fff);border:0;font-weight:900}
 .chf .chsd[disabled]{opacity:.5}
-.chnote{font-size:11px;color:var(--mu);text-align:center;padding:6px 14px 0;background:var(--card)}
+.chttl{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--card);border-bottom:1px solid var(--bd,#23376e);font-size:12px;text-align:left}.chttl b{flex:none}.chttl select{flex:1;min-width:0;margin:0;padding:8px;font-size:14px}.chex{display:block;color:var(--mu);font-size:11px;margin-top:1px}
+.chnote.off{display:none!important}.chnote{font-size:11px;color:var(--mu);text-align:center;padding:6px 14px 0;background:var(--card)}
 .chem{margin:auto;text-align:center;color:var(--mu);padding:20px;font-size:14px;line-height:1.5}
 .chth{display:flex;align-items:center;gap:12px;padding:12px;border-radius:16px;background:var(--card2);border:1px solid var(--bd,#23376e);text-align:left;width:100%;color:var(--tx)}
 .chth i{flex:none;width:42px;height:42px;border-radius:50%;background:color-mix(in srgb,var(--glow) 20%,transparent);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900}
@@ -3227,13 +3228,18 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
 <script>
 (function(){
  var CID='chat';
+ var WARN='🔒 Conversation confidentielle. Ton ID est inscrit à l’écran : toute diffusion de cette conversation peut être retracée jusqu’à toi.';
  try{var sx=CSEC.find(function(x){return x.items.some(function(i){return i.k==='theme'})});
   if(sx&&!sx.items.some(function(i){return i.k===CID}))sx.items.unshift({k:CID,ic:'💬',t:'Chat client / admin (chiffré)',tg:1,def:1,d:'Messagerie privée entre le client et toi, chiffrée sur le serveur. Nécessite le script SQL 13 et la fonction « chat ».',f:[
    {n:'pub',l:'Mode public activé par défaut (textes floutés jusqu’au toucher)',t:'chk',d:false},
    {n:'sec',l:'Secondes avant de reflouter une photo',t:'num',d:20},
-   {n:'btn',l:'Texte du bouton dans le profil',t:'text',d:'Écrire à la boutique'}]})}catch(e){}
- function C(){try{var v=cfgV(CID)||{};return{on:v.on!==false,pub:!!v.pub,sec:Math.max(3,+v.sec||20),btn:v.btn||'Écrire à la boutique'}}catch(e){return{on:true,pub:false,sec:20,btn:'Écrire à la boutique'}}}
+   {n:'btn',l:'Texte du bouton dans le profil',t:'text',d:'Écrire à la boutique'},
+   {n:'warn',l:'Avertissement affiché au client dans le chat (vide = aucun)',t:'text',d:WARN}]})}catch(e){}
+ function C(){try{var v=cfgV(CID)||{};return{on:v.on!==false,pub:!!v.pub,sec:Math.max(3,+v.sec||20),btn:v.btn||'Écrire à la boutique',warn:v.warn===undefined?WARN:String(v.warn)}}catch(e){return{on:true,pub:false,sec:20,btn:'Écrire à la boutique',warn:WARN}}}
  function uid(){try{var u=TGU();if(u&&u.id)return u.id;var d=TGI();if(d){var j=new URLSearchParams(d).get('user');if(j){u=JSON.parse(j);if(u&&u.id)return u.id}}}catch(e){}return 0}
+ var TTLS=[[0,'Jamais (90 jours maximum)'],[5,'5 minutes'],[60,'1 heure'],[360,'6 heures'],[1440,'24 heures'],[10080,'7 jours'],[43200,'30 jours']];
+ var TTLC={5:'5 min',60:'1 h',360:'6 h',1440:'24 h',10080:'7 jours',43200:'30 jours'};
+ function ttlTxt(m){return m>0?T('⏳ Messages supprimés après '+(TTLC[m]||Math.round(m/60)+' h')):''}
  function T(s){try{var e=I18N_DICT[i18nNK(s)],k=['en','es','de','ar'].indexOf(LANG);return e&&k>=0&&e[k]?e[k]:s}catch(x){return s}}
  function hh(ts){try{var d=new Date(ts);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}catch(e){return ''}}
  function call(adm,body){
@@ -3254,25 +3260,30 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
   im.onerror=function(){rej(new Error('img'))};im.src=u})}
 
  function Chat(adm){
-  var id=adm?'ovChatA':'ovChat',S={msgs:[],last:0,cid:0,name:'',mode:adm?'list':'thread',pub:C().pub,timer:0,idleAt:0,imgs:{},q:[],busy:false,sending:false,drops:0};
+  var id=adm?'ovChatA':'ovChat',S={msgs:[],last:0,cid:0,name:'',mode:adm?'list':'thread',pub:C().pub,timer:0,idleAt:0,imgs:{},q:[],busy:false,sending:false,drops:0,ttl:0,own:null,def:0};
   var ov,m,tf,btn,hd,ti,sub;
   function build(){
    if(document.getElementById(id)){ov=document.getElementById(id);return}
    ov=document.createElement('div');ov.className='ov';ov.id=id;if(adm)ov.setAttribute('data-notr','');
-   ov.innerHTML='<div class="chp"><div class="chh"><button type="button" class="chbk" data-close aria-label="Retour">‹</button><div class="cht"><b class="chti">'+(adm?'Messages clients':'Chat avec la boutique')+'</b><small class="chsb">🔒 Chiffré sur le serveur</small></div>'
+   ov.innerHTML='<div class="chp"><div class="chh"><button type="button" class="chbk" data-close aria-label="Retour">‹</button><div class="cht"><b class="chti">'+(adm?'Messages clients':'Chat avec la boutique')+'</b><small class="chsb">🔒 Chiffré sur le serveur</small><small class="chex" style="display:none"></small></div>'
     +(adm?'<button type="button" class="chdl" data-chdel hidden title="Supprimer la conversation">🗑</button>':'')
     +'<button type="button" class="chpb" data-chpub title="Mode public : floute les textes">🙈</button></div>'
-    +'<div class="chmw"><div class="chm" data-notr></div><div class="chw"></div><div class="chaway" data-chaway>🔒 Écran protégé<br><small style="font-weight:600;opacity:.7">Touche pour afficher</small></div></div>'
-    +'<div class="chnote">🔒 Telegram ne permet pas de bloquer les captures d’écran : les messages sont floutés quand tu quittes l’écran et ton ID est en filigrane.</div>'
+    +(adm?'<div class="chttl"><b></b><select></select></div>':'')+'<div class="chmw"><div class="chm" data-notr></div><div class="chw"></div><div class="chaway" data-chaway>🔒 Écran protégé<br><small style="font-weight:600;opacity:.7">Touche pour afficher</small></div></div>'
+    +'<div class="chnote"></div>'
     +'<div class="chf"><label class="chcam">📷<input type="file" accept="image/*" hidden></label><textarea rows="1" maxlength="2000" placeholder="Écris ton message…"></textarea><button type="button" class="chsd" data-chsend aria-label="Envoyer">➤</button></div></div>';
    document.body.appendChild(ov);
    m=ov.querySelector('.chm');tf=ov.querySelector('textarea');
+   var nt=ov.querySelector('.chnote'),wr=adm?'':C().warn;if(wr){nt.textContent=(wr===WARN?T(WARN):wr)}else nt.classList.add('off');
    ov.querySelector('.chw').style.backgroundImage=wm(adm?'ADMIN · '+(uid()||''):'ID '+(uid()||'?'));
    ov.addEventListener('contextmenu',function(e){e.preventDefault()});
+   var ts=ov.querySelector('.chttl select');if(ts)ts.addEventListener('change',function(){var th=S.mode==='thread',v=ts.value;
+    call(true,{a:'setttl',cid:th?S.cid:0,min:v===''?null:+v}).then(function(r){if(!r||r.error){toast((r&&r.error)||'Erreur');return}
+     if(th)S.own=v===''?null:+v;else S.def=+v;ttlUi();toast('Réglage enregistré (messages à venir)')})});
    ov.querySelector('input[type=file]').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];e.target.value='';if(f)photo(f)});
    tf.addEventListener('input',function(){tf.style.height='auto';tf.style.height=Math.min(120,tf.scrollHeight)+'px'});
    ov.addEventListener('click',function(e){
-    var t=e.target.closest('[data-chsend],[data-chpub],[data-chaway],[data-chdel],[data-chback],[data-chth],.cim,.cmb');if(!t)return;
+    var t=e.target.closest('[data-chsend],[data-chpub],[data-chaway],[data-chdel],[data-chback],[data-chth],[data-chrelog],.cim,.cmb');if(!t)return;
+    if(t.hasAttribute('data-chrelog')){window.__chatRelog();return}
     if(t.hasAttribute('data-chsend'))return send();
     if(t.hasAttribute('data-chpub')){S.pub=!S.pub;paint();return}
     if(t.hasAttribute('data-chaway')){away(false);return}
@@ -3289,7 +3300,13 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
    var bk=ov.querySelector('.chbk');if(adm&&S.mode==='thread'){bk.removeAttribute('data-close');bk.setAttribute('data-chback','')}else{bk.removeAttribute('data-chback');bk.setAttribute('data-close','')}
    var dl=ov.querySelector('.chdl');if(dl)dl.hidden=!(adm&&S.mode==='thread');
    ov.querySelector('.chti').textContent=adm?(S.mode==='thread'?S.name:'Messages clients'):'Chat avec la boutique';
-   ov.querySelector('.chsb').textContent=adm&&S.mode==='thread'?'ID '+S.cid+' · 🔒 Chiffré':'🔒 Chiffré sur le serveur'}
+   ov.querySelector('.chsb').textContent=adm&&S.mode==='thread'?'ID '+S.cid+' · 🔒 Chiffré':'🔒 Chiffré sur le serveur';
+   var ex=ov.querySelector('.chex');if(ex){var tx=adm?'':ttlTxt(S.ttl);ex.textContent=tx;ex.style.display=tx?'block':'none'}
+   ttlUi()}
+  function ttlUi(){if(!adm||!ov)return;var bar=ov.querySelector('.chttl');if(!bar)return;var th=S.mode==='thread',sel=bar.querySelector('select');
+   bar.querySelector('b').textContent=th?'⏳ Ce client :':'⏳ Tous les clients :';
+   sel.innerHTML=(th?'<option value="">Comme le réglage général ('+esc((TTLS.find(function(x){return x[0]===S.def})||TTLS[0])[1])+')</option>':'')+TTLS.map(function(x){return '<option value="'+x[0]+'">'+x[1]+'</option>'}).join('');
+   sel.value=th?(S.own===null||S.own===undefined?'':String(S.own)):String(S.def)}
   function away(v){var p=ov&&ov.querySelector('.chp');if(p&&ov.classList.contains('show'))p.classList.toggle('away',!!v)}
   function note(txt){m.innerHTML='<div class="chem">'+(adm?txt:T(txt))+'</div>'}
   function near(){return m.scrollHeight-m.scrollTop-m.clientHeight<140}
@@ -3321,22 +3338,23 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
    if(adm&&S.mode==='list')return list(true);
    if(adm&&!S.cid)return;
    var body=adm?{a:'thread',cid:S.cid,after:S.last}:{a:'list',after:S.last};
-   call(adm,body).then(function(r){if(!r||r.error){S.drops++;return}S.drops=0;if(r.msgs&&r.msgs.length){S.idleAt=Date.now();add(r.msgs)}})}
+   call(adm,body).then(function(r){if(!r||r.error){S.drops++;return}S.drops=0;if(!adm&&r.ttl!==undefined&&r.ttl!==S.ttl){S.ttl=r.ttl||0;paint()}if(r.msgs&&r.msgs.length){S.idleAt=Date.now();add(r.msgs)}})}
   function loop(){clearTimeout(S.timer);if(!ov||!ov.classList.contains('show')){S.timer=0;return}
    tick();var idle=Date.now()-S.idleAt>180000;S.timer=setTimeout(loop,(idle?20000:8000)*(S.drops>2?3:1))}
   function list(quiet){if(!adm)return;S.mode='list';S.cid=0;paint();
    if(!quiet)note('Chargement…');
    call(true,{a:'threads'}).then(function(r){if(S.mode!=='list')return;
-    if(!r||r.error){if(!quiet)note(esc((r&&r.error)||'Erreur'));return}
-    var n=document.getElementById('n-chat');if(n)n.textContent=r.unread||0;
+    if(!r||r.error){if(!quiet)relog((r&&r.error)||'Erreur');return}
+    var n=document.getElementById('n-chat');if(n)n.textContent=r.unread||0;S.def=r.ttl_def||0;ttlUi();
     if(!r.threads.length){note('Aucun message de client pour l’instant.');return}
     m.innerHTML=r.threads.map(function(t){return '<button type="button" class="chth" data-chth="'+t.cid+'" data-nm="'+esc(t.name)+'"><i>'+esc((t.name||'?').trim()[0]||'?').toUpperCase()+'</i><div><b>'+esc(t.name)+'</b><small>'+(t.a?'↩ ':'')+esc(t.p)+'</small></div>'+(t.unread?'<em>'+t.unread+'</em>':'')+'</button>'}).join('')})}
+  function relog(msg){note(esc(msg)+'<br><br><button type="button" class="btn" data-chrelog>🔄 Me reconnecter (efface la session de cet appareil)</button>')}
   function thread(cid,name){S.mode='thread';S.cid=cid;S.name=name||String(cid);S.msgs=[];S.last=0;S.q=[];S.drops=0;S.idleAt=Date.now();paint();note('Chargement…');
-   call(true,{a:'thread',cid:cid}).then(function(r){if(S.cid!==cid)return;if(!r||r.error){note(esc((r&&r.error)||'Erreur'));return}m.innerHTML='';add(r.msgs||[]);if(!(r.msgs||[]).length)note('Aucun message.')})}
+   call(true,{a:'thread',cid:cid}).then(function(r){if(S.cid!==cid)return;if(!r||r.error){note(esc((r&&r.error)||'Erreur'));return}m.innerHTML='';S.own=r.ttl===undefined?null:r.ttl;S.def=r.ttl_def||0;ttlUi();add(r.msgs||[]);if(!(r.msgs||[]).length)note('Aucun message.')})}
   function openClient(){
    if(!uid()||typeof sb==='undefined'||!sb){note('Ouvre la boutique depuis le bouton du bot dans Telegram pour utiliser le chat.');ov.querySelector('.chf').style.display='none';ov.querySelector('.chnote').style.display='none';return}
    S.msgs=[];S.last=0;S.q=[];S.drops=0;S.idleAt=Date.now();note('Chargement…');
-   call(false,{a:'list'}).then(function(r){if(!r||r.error){note(esc((r&&r.error)||'Erreur'));return}m.innerHTML='';add(r.msgs||[]);if(!(r.msgs||[]).length)note('Aucun message pour l’instant. Écris-nous !');var b=document.querySelector('.chbtn em');if(b)b.hidden=true;window.__chatUn=0})}
+   call(false,{a:'list'}).then(function(r){if(!r||r.error){note(esc((r&&r.error)||'Erreur'));return}m.innerHTML='';S.ttl=r.ttl||0;paint();add(r.msgs||[]);if(!(r.msgs||[]).length)note('Aucun message pour l’instant. Écris-nous !');var b=document.querySelector('.chbtn em');if(b)b.hidden=true;window.__chatUn=0})}
   function open(){build();S.pub=C().pub;ov.classList.add('show');away(false);paint();
    if(adm)list();else openClient();clearTimeout(S.timer);S.timer=setTimeout(loop,8000)}
   function send(imgData){
@@ -3346,10 +3364,18 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
    call(adm,body).then(function(r){S.sending=false;bt.disabled=false;
     if(!r||r.error)return fail(r);
     tf.value='';tf.style.height='auto';S.idleAt=Date.now();
-    var x={id:r.id,a:adm,t:t,img:!!imgData,ts:r.ts||new Date().toISOString()};if(imgData)S.imgs[r.id]=imgData;add([x]);bot()})}
+    if(!adm&&r.ttl!==undefined&&r.ttl!==S.ttl){S.ttl=r.ttl||0;paint()}var x={id:r.id,a:adm,t:t,img:!!imgData,ts:r.ts||new Date().toISOString(),exp:r.exp||null};if(imgData)S.imgs[r.id]=imgData;add([x]);bot()})}
   function photo(f){shrink(f).then(function(d){send(d)},function(){toast('Photo illisible ou trop lourde')})}
-  return{open:open,build:build,away:away,reblur:function(){if(ov)reblurAll()},isOpen:function(){return !!ov&&ov.classList.contains('show')},S:S,stop:function(){clearTimeout(S.timer)},list:list}
+  function sweep(){if(!ov||!m||!S.msgs.length)return;var now=Date.now(),gone=S.msgs.filter(function(x){return x.exp&&new Date(x.exp).getTime()<=now});if(!gone.length)return;
+   gone.forEach(function(x){var e=m.querySelector('.cmr[data-id="'+x.id+'"]');if(e)e.remove();delete S.imgs[x.id]});
+   S.msgs=S.msgs.filter(function(x){return gone.indexOf(x)<0});if(!S.msgs.length)note(adm?'Aucun message.':'Aucun message pour l’instant. Écris-nous !')}
+  setInterval(sweep,10000);
+  return{sweep:sweep,open:open,build:build,away:away,reblur:function(){if(ov)reblurAll()},isOpen:function(){return !!ov&&ov.classList.contains('show')},S:S,stop:function(){clearTimeout(S.timer)},list:list}
  }
+ window.__chatRelog=function(){
+  var go=function(){try{Object.keys(localStorage).forEach(function(k){if(/^sb-|^supabase\.auth|^skf_pass$/.test(k))localStorage.removeItem(k)})}catch(e){}try{sessionStorage.clear()}catch(e){}location.reload()};
+  try{var p=sb&&sb.auth&&sb.auth.signOut({scope:'local'});if(p&&p.then)p.then(go,go);else go()}catch(e){go()}
+  setTimeout(go,2500)};
  var CL=Chat(false),AD=Chat(true);
  // --- protection : écran flouté quand on quitte l'app ---
  function hide(){[CL,AD].forEach(function(c){if(c.isOpen()){c.away(true);c.reblur()}})}
@@ -3389,6 +3415,13 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
  ['Aucun message pour l’instant. Écris-nous !',['No messages yet. Write to us!','Aún no hay mensajes. ¡Escríbenos!','Noch keine Nachrichten. Schreib uns!','لا رسائل بعد. راسلنا!']],
  ['Ouvre la boutique depuis le bouton du bot dans Telegram pour utiliser le chat.',['Open the shop from the bot button in Telegram to use the chat.','Abre la tienda desde el botón del bot en Telegram para usar el chat.','Öffne den Shop über den Bot-Button in Telegram, um den Chat zu nutzen.','افتح المتجر من زر البوت في تيليجرام لاستخدام الدردشة.']],
  ['🔒 Telegram ne permet pas de bloquer les captures d’écran : les messages sont floutés quand tu quittes l’écran et ton ID est en filigrane.',['🔒 Telegram cannot block screenshots: messages are blurred when you leave the screen and your ID is shown as a watermark.','🔒 Telegram no permite bloquear las capturas: los mensajes se difuminan al salir de la pantalla y tu ID aparece como marca de agua.','🔒 Telegram kann Screenshots nicht blockieren: Nachrichten werden unscharf, sobald du den Bildschirm verlässt, und deine ID erscheint als Wasserzeichen.','🔒 لا يتيح تيليجرام منع لقطات الشاشة: تُموَّه الرسائل عند مغادرة الشاشة ويظهر رقمك كعلامة مائية.']],
+ ['🔒 Conversation confidentielle. Ton ID est inscrit à l’écran : toute diffusion de cette conversation peut être retracée jusqu’à toi.',['🔒 Confidential conversation. Your ID is shown on screen: any sharing of this conversation can be traced back to you.','🔒 Conversación confidencial. Tu ID aparece en pantalla: cualquier difusión de esta conversación puede rastrearse hasta ti.','🔒 Vertrauliche Unterhaltung. Deine ID steht auf dem Bildschirm: jede Weitergabe dieser Unterhaltung lässt sich zu dir zurückverfolgen.','🔒 محادثة سرية. رقمك ظاهر على الشاشة: أي نشر لهذه المحادثة يمكن تتبعه إليك.']],
+ ['⏳ Messages supprimés après 5 min',['⏳ Messages deleted after 5 min','⏳ Mensajes eliminados tras 5 min','⏳ Nachrichten werden nach 5 Min. gelöscht','⏳ تُحذف الرسائل بعد 5 دقائق']],
+ ['⏳ Messages supprimés après 1 h',['⏳ Messages deleted after 1 h','⏳ Mensajes eliminados tras 1 h','⏳ Nachrichten werden nach 1 Std. gelöscht','⏳ تُحذف الرسائل بعد ساعة']],
+ ['⏳ Messages supprimés après 6 h',['⏳ Messages deleted after 6 h','⏳ Mensajes eliminados tras 6 h','⏳ Nachrichten werden nach 6 Std. gelöscht','⏳ تُحذف الرسائل بعد 6 ساعات']],
+ ['⏳ Messages supprimés après 24 h',['⏳ Messages deleted after 24 h','⏳ Mensajes eliminados tras 24 h','⏳ Nachrichten werden nach 24 Std. gelöscht','⏳ تُحذف الرسائل بعد 24 ساعة']],
+ ['⏳ Messages supprimés après 7 jours',['⏳ Messages deleted after 7 days','⏳ Mensajes eliminados tras 7 días','⏳ Nachrichten werden nach 7 Tagen gelöscht','⏳ تُحذف الرسائل بعد 7 أيام']],
+ ['⏳ Messages supprimés après 30 jours',['⏳ Messages deleted after 30 days','⏳ Mensajes eliminados tras 30 días','⏳ Nachrichten werden nach 30 Tagen gelöscht','⏳ تُحذف الرسائل بعد 30 يومًا']],
  ['🔒 Chat privé chiffré',['🔒 Private encrypted chat','🔒 Chat privado cifrado','🔒 Privater verschlüsselter Chat','🔒 دردشة خاصة مشفّرة']],
  ['Écrire à la boutique',['Write to the shop','Escribir a la tienda','Dem Shop schreiben','راسل المتجر']],
  ['Écris ton message…',['Type your message…','Escribe tu mensaje…','Schreib deine Nachricht…','اكتب رسالتك…']],
