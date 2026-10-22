@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='22 oct. · 21h30 · Défi prêt';
+var APP_V='22 oct. · 22h00 · Sans H/F/E, rupture';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3430,6 +3430,10 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
   }catch(e){}
   return h};
 
+
+ /* rupture de stock : on ne montre plus les prix */
+ var st=document.createElement('style');st.textContent=".card.oos .row>b,.card.oos .row s,.card.oos .row del,.card.oos .row .pr,.card.oos .row .old,.card.oos .row .dis{display:none!important}#pS.oosp #dt,#pS.oosp [data-vr] b,#pS.oosp [data-vr] .vpr,#pS.oosp .pold,#pS.oosp .tot{display:none!important}#pS [data-vr][disabled] b{display:none!important}";document.head.appendChild(st);
+ if(typeof openP==='function'){var _o=openP;openP=function(id){var r=_o.apply(this,arguments);try{var p=products.find(function(x){return x.id==id}),s=document.getElementById('pS');if(s)s.classList.toggle('oosp',!!(p&&p.st!=null&&p.st<=0))}catch(e){}return r}}
 })();
 </script>
 <style id="pccss">
@@ -3584,17 +3588,17 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
 </style>
 <script>
 (function(){
- var AUD=[['H','👨 Homme'],['F','👩 Femme'],['E','🧒 Enfant']];
+ var AUD=[];
  /* ===== Public : Homme / Femme / Enfant (stocké dans le produit, sans nouveau script SQL) ===== */
  function pa(p){var a=p&&p.i&&p.i._a;return typeof a==='string'?a.split(','):[]}
- window.audOk=function(p){var f=S.aud;if(!f)return true;var a=pa(p);return !a.length||a.indexOf(f)>=0};
- function audTag(p,d){var a=pa(p);if(!a.length)return'';return '<div class="audtag'+(d?' d':'')+'">'+a.map(function(k){var x=AUD.filter(function(y){return y[0]===k})[0];return x?'<i>'+x[1]+'</i>':''}).join('')+'</div>'}
+ window.audOk=function(p){return true;var f=S.aud;if(!f)return true;var a=pa(p);return !a.length||a.indexOf(f)>=0};
+ function audTag(p,d){return '';var a=pa(p);if(!a.length)return'';return '<div class="audtag'+(d?' d':'')+'">'+a.map(function(k){var x=AUD.filter(function(y){return y[0]===k})[0];return x?'<i>'+x[1]+'</i>':''}).join('')+'</div>'}
  var _cd=card;card=function(p,i){var h=_cd.apply(this,arguments);try{var t=audTag(p);if(t)h=h.replace(/(<div class=['"]ph['"][^>]*>)/,'$1'+t)}catch(e){}return h};
  var _op=openP;openP=function(id){var r=_op.apply(this,arguments);try{var p=products.find(function(x){return x.id==id}),h=document.querySelector('#pS h2');if(p&&h&&!document.querySelector('#pS .audtag'))h.insertAdjacentHTML('afterend',audTag(p,1))}catch(e){}return r};
- window.audBar=function(){try{if(!products.some(function(p){return pa(p).length}))return'';
+ window.audBar=function(){return '';try{if(!products.some(function(p){return pa(p).length}))return'';
   return '<div class="audb">'+[['','Tous']].concat(AUD).map(function(x){return '<button class="cat '+((S.aud||'')===x[0]?'on':'')+'" data-aud="'+x[0]+'">'+x[1]+'</button>'}).join('')+'</div>'}catch(e){return''}};
  document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-aud]');if(!t)return;e.preventDefault();e.stopPropagation();S.aud=t.dataset.aud||'';save();render()},true);
- var _pf=pform;pform=function(id){var r=_pf.apply(this,arguments);try{var fc=$('#fc');if(!fc||$('#audf'))return r;var cur=pa(edit);
+ var _pf=pform;pform=function(id){var r=_pf.apply(this,arguments);return r;try{var fc=$('#fc');if(!fc||$('#audf'))return r;var cur=pa(edit);
    var d=document.createElement('div');d.id='audf';d.innerHTML='<div class="note" style="margin:6px 0 0">Pour qui ? (ne coche rien = visible partout)</div><div class="audf">'+AUD.map(function(x){return '<label><input type="checkbox" data-audk="'+x[0]+'" '+(cur.indexOf(x[0])>=0?'checked':'')+'>'+x[1]+'</label>'}).join('')+'</div>';
    var anchor=fc.nextSibling&&fc.nextSibling.tagName==='DATALIST'?fc.nextSibling:fc;anchor.parentNode.insertBefore(d,anchor.nextSibling)}catch(e){}return r};
  function audSel(){var a=[];document.querySelectorAll('[data-audk]').forEach(function(c){if(c.checked)a.push(c.dataset.audk)});return a.join(',')}
