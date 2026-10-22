@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='22 oct. · 20h45 · Loader court';
+var APP_V='22 oct. · 21h00 · Loader chaque fois';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3366,7 +3366,7 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
 </style>
 <script>
 (function(){
- var SRC='srcdoc',LS='skf_introv',CAP=9500,WAIT_LOAD=2500,MINRUN=1800;
+ var SRC='srcdoc',LS='skf_introv',ONCE=false,CAP=9500,WAIT_LOAD=2500,MINRUN=1800;
  function today(){try{return new Date().toISOString().slice(0,10)}catch(e){return''}}
  function seenToday(){try{return localStorage.getItem(LS)===today()}catch(e){return false}}
  function mark(){try{localStorage.setItem(LS,today())}catch(e){}}
@@ -3378,7 +3378,7 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
   var cfg;try{cfg=cfgGet()}catch(e){cfg={on:true}}
   if(!cfg.on||(typeof iaNone==='function'&&iaNone()))return false;      /* intro désactivée dans l'admin : comportement d'origine */
   if(reduced())return false;                                              /* réduction des animations : intro d'origine */
-  if(seenToday())return false;                                            /* une fois par jour */
+  if(ONCE&&seenToday())return false;                                    /* ONCE=false : le loader passe à chaque ouverture */                                            /* une fois par jour */
   if(slowNet()){mark();el.style.display='none';introEnd(true);return true}   /* connexion lente : boutique directe */
   var done=false,t0=performance.now(),loaded=false,fin=false,finEnd=false;
   var kv=document.createElement('div');kv.className='kv';
