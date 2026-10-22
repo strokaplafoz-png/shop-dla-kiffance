@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='22 oct. · 22h00 · Sans H/F/E, rupture';
+var APP_V='22 oct. · 22h30 · Machine à sous images';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -4693,6 +4693,72 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
  ].forEach(function(e){I18N_DICT[i18nNK(e[0])]=e[1]})}catch(e){}
  inject();setTimeout(inject,1500);
  window.__sl={open:open,begin:begin,spin:spin,state:function(){return G},allowed:allowed,pool:pool,setup:setup,C:C,sound:{log:function(){return LOG},ctx:function(){return AC}}};
+})();
+</script>
+<style id="slpkcss">
+#slpk,#sllt{margin:6px 0 12px}
+.slpg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.slpi{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px 7px;border-radius:12px;border:2px solid var(--bd,#23376e);background:var(--card2,#101a38);color:var(--tx,#eef3ff);font-size:12px;line-height:1.15;text-align:center;-webkit-tap-highlight-color:transparent}
+.slpi .sim{width:100%;aspect-ratio:1;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px;background:rgba(255,255,255,.04)}
+.slpi .sim img{width:100%;height:100%;object-fit:cover;display:block}
+.slpi.on{border-color:var(--glow,#b5f23d);box-shadow:0 0 0 1px var(--glow,#b5f23d) inset}
+.slpi.on::after{content:'✓';position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--glow,#b5f23d);color:#04120b;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center}
+.slpi span.sn{display:block;max-height:2.3em;overflow:hidden;word-break:break-word}
+.sllr{display:flex;gap:8px;align-items:center;margin:8px 0}
+.sllr input{margin:0;min-width:0}
+.sllr .l{flex:1 1 0}.sllr .w{width:70px;flex:none;text-align:center}
+.sllr .pbn{flex:none;width:52px;height:52px;border-radius:10px;border:2px dashed var(--bd,#23376e);background:var(--card2,#101a38);color:var(--mu,#9fb0d8);font-size:11px;padding:0;overflow:hidden;display:flex;align-items:center;justify-content:center;line-height:1.1}
+.sllr .pbn.has{font-size:26px;border-style:solid;border-color:var(--glow,#b5f23d)}
+.sllr .pbn img{width:100%;height:100%;object-fit:cover}
+.sllr .rx{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--bd,#23376e);background:transparent;color:#ff6b8a;font-size:15px;padding:0}
+#slch{margin:6px 0 10px;padding:10px;border-radius:14px;border:1px solid var(--glow,#b5f23d);background:rgba(0,0,0,.25)}
+#slch .t{font-weight:700;margin-bottom:8px;font-size:14px}
+.slhd{font-size:12px;color:var(--mu,#9fb0d8);margin:2px 0 8px;text-align:left}
+</style>
+<script>
+(function(){
+ var ID='slot';
+ function norm(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim()}
+ function isV(u){try{return typeof isVid==='function'?!!isVid(u):/\.(mp4|mov|m4v|webm)(\?|$)/i.test(u)}catch(e){return false}}
+ function img(p){var L=p.ph||[],i,c;for(i=0;i<L.length;i++){c=L[i];if(c&&typeof c!=='string')c=c.url||c.u||'';if(typeof c==='string'&&c&&!isV(c)&&/^(https?:|data:image|\/)/.test(c))return c}return''}
+ function thumb(p){var u=img(p);return u?'<img src="'+esc(u)+'" alt="" loading="lazy" decoding="async">':esc(p.e||'🎁')}
+ function byName(n){var q=norm(n);if(!q)return null;try{return products.find(function(x){return norm(x.n)===q})||products.find(function(x){return norm(x.n).indexOf(q)>=0})||null}catch(e){return null}}
+ function tile(p,on,attr){return '<button type="button" class="slpi'+(on?' on':'')+'" '+attr+'><span class="sim">'+thumb(p)+'</span><span class="sn">'+esc(p.n)+'</span></button>'}
+ function enh(){
+  var ta=document.getElementById('cf_syms'),tl=document.getElementById('cf_lots');if(!ta||!tl||document.getElementById('slpk'))return;
+  var P=[];try{P=products.slice()}catch(e){}
+  /* ---------- 1) produits sur les rouleaux ---------- */
+  var lab=ta.previousElementSibling;if(lab&&lab.classList.contains('fl'))lab.textContent='Produits affichés sur les rouleaux : touche les photos';
+  ta.style.display='none';
+  var box=document.createElement('div');box.id='slpk';ta.parentNode.insertBefore(box,ta.nextSibling);
+  function selNames(){return ta.value.split(/\n/).map(function(s){return s.trim()}).filter(Boolean)}
+  function selSet(){var s={};selNames().forEach(function(n){var p=byName(n);s[p?'p'+p.id:'t'+n]=1});return s}
+  function drawS(){var s=selSet(),raw=selNames().filter(function(n){return!byName(n)});
+   box.innerHTML='<div class="slhd">Rien de sélectionné = tes produits au hasard. Touche une photo pour l’ajouter ou l’enlever.</div>'+(P.length?'<div class="slpg">'+P.map(function(p){return tile(p,!!s['p'+p.id],'data-slp="'+p.id+'"')}).join('')+'</div>':'<p class="note">Aucun produit dans la boutique pour le moment.</p>')+(raw.length?'<div class="slhd" style="margin-top:8px">Autres symboles : '+raw.map(esc).join(' · ')+'</div>':'')}
+  box.addEventListener('click',function(e){var b=e.target.closest('[data-slp]');if(!b)return;e.preventDefault();e.stopPropagation();var p=P.find(function(x){return String(x.id)===b.dataset.slp});if(!p)return;
+   var cur=selNames(),i=cur.findIndex(function(n){var q=byName(n);return q&&q.id===p.id});if(i>=0)cur.splice(i,1);else cur.push(p.n);ta.value=cur.join('\n');drawS()});
+  drawS();
+  /* ---------- 2) lots + produit gagnant ---------- */
+  var lab2=tl.previousElementSibling;if(lab2&&lab2.classList.contains('fl'))lab2.textContent='Lots : nom du lot, chance, et photo du produit gagnant (« Perdu » = pas de gain)';
+  tl.style.display='none';
+  var lt=document.createElement('div');lt.id='sllt';tl.parentNode.insertBefore(lt,tl.nextSibling);
+  var rows=tl.value.split(/\n/).map(function(l){return l.trim()}).filter(Boolean).map(function(l){var p=l.split('|');return{l:(p[0]||'').trim(),w:(p.length>1?p[1].trim():'10'),s:(p[2]||'').trim()}});
+  var open=-1;
+  function sync(){tl.value=rows.filter(function(r){return r.l}).map(function(r){return r.l.replace(/\|/g,'/')+' | '+(String(r.w).trim()===''?'10':String(r.w).replace(/[^\d.]/g,''))+(r.s?' | '+r.s.replace(/\|/g,'/'):'')}).join('\n')}
+  function drawL(){var h='';
+   rows.forEach(function(r,i){var p=r.s?byName(r.s):null;
+    h+='<div class="sllr" data-i="'+i+'"><input class="l" data-slf="l" placeholder="Lot (ex : −10 %)" value="'+esc(r.l)+'"><input class="w" data-slf="w" type="number" inputmode="decimal" min="0" placeholder="Chance" value="'+esc(r.w)+'"><button type="button" class="pbn'+(r.s?' has':'')+'" data-slpb="'+i+'" aria-label="Choisir le produit gagnant">'+(p?'<span class="sim" style="all:unset;display:block;width:100%;height:100%">'+thumb(p)+'</span>':(r.s?esc(r.s.slice(0,6)):'Produit'))+'</button><button type="button" class="rx" data-slrm="'+i+'" aria-label="Supprimer">✕</button></div>';
+    if(open===i)h+='<div id="slch"><div class="t">Produit gagné pour « '+esc(r.l||'ce lot')+' »</div><div class="slpg"><button type="button" class="slpi'+(!r.s?' on':'')+'" data-slch="-1"><span class="sim">🚫</span><span class="sn">Aucun</span></button>'+P.map(function(p){var on=r.s&&byName(r.s)&&byName(r.s).id===p.id;return tile(p,!!on,'data-slch="'+p.id+'"')}).join('')+'</div></div>'});
+   h+='<button type="button" class="btn alt" data-sladd style="margin-top:6px">+ Ajouter un lot</button>';lt.innerHTML=h}
+  lt.addEventListener('input',function(e){var r=e.target.closest('.sllr'),f=e.target.dataset&&e.target.dataset.slf;if(!r||!f)return;rows[+r.dataset.i][f]=e.target.value;sync()});
+  lt.addEventListener('click',function(e){var t=e.target,b;
+   if(b=t.closest('[data-slpb]')){e.preventDefault();e.stopPropagation();var i=+b.dataset.slpb;open=open===i?-1:i;drawL();return}
+   if(b=t.closest('[data-slch]')){e.preventDefault();e.stopPropagation();var p=P.find(function(x){return String(x.id)===b.dataset.slch});rows[open].s=p?p.n:'';open=-1;sync();drawL();return}
+   if(b=t.closest('[data-slrm]')){e.preventDefault();e.stopPropagation();rows.splice(+b.dataset.slrm,1);open=-1;sync();drawL();return}
+   if(t.closest('[data-sladd]')){e.preventDefault();e.stopPropagation();rows.push({l:'',w:'10',s:''});sync();drawL();return}});
+  sync();drawL()}
+ var _cf=cfgForm;cfgForm=function(k){var r=_cf.apply(this,arguments);if(k===ID){try{enh()}catch(e){}}return r};
+ window.__slpk={enh:enh};
 })();
 </script>
 <script>
