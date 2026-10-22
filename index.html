@@ -475,7 +475,7 @@ $('#aS').addEventListener('input',e=>{const k=e.target.dataset.k;if(k){RULES[k]=
 const CFG_OK=/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(CFG.url||'')&&!/TON-PROJET|TA[-_]CLE/i.test((CFG.url||'')+(CFG.key||''))&&(CFG.key||'').length>20,
  sb=(CFG_OK&&window.supabase)?supabase.createClient(CFG.url,CFG.key):null;
 let DB=sb?'wait':'demo',ses=null,edit=null,fotos=[],repIdx=0,selV='';
-const thumb=p=>p.ph&&p.ph[0]&&isVid(p.ph[0])?vthumb(p.ph[0]):p.ph&&p.ph[0]?`<img src='${esc(p.ph[0])}' alt='' loading='lazy'>`:`<span>${p.e||'🛍️'}</span>`;
+const thumb=p=>(window.__lkOn&&window.__lkOn())?window.__lkT():thumb0(p);const thumb0=p=>p.ph&&p.ph[0]&&isVid(p.ph[0])?vthumb(p.ph[0]):p.ph&&p.ph[0]?`<img src='${esc(p.ph[0])}' alt='' loading='lazy'>`:`<span>${p.e||'🛍️'}</span>`;
 function lineOf(k){const[i,v]=String(k).split('~'),p=products.find(x=>x.id==i);return p?{...p,id:k,n:p.n+(v?' · '+v:''),vr:null}:null}
 const fromRow=r=>({id:r.id,n:r.name,p:+r.price,c:r.category,d:r.description||'',st:r.stock,vr:r.variants||[],ph:r.photos||[],i:r.i18n||{},top:!!r.top,sk:(r.sk&&typeof r.sk==='object')?r.sk:undefined,vp:(r.vp&&typeof r.vp==='object')?r.vp:undefined,e:'🛍️'});
 async function loadProducts(){if(!sb)return;try{const{data,error}=await sb.from('products').select('*').order('id');if(error)throw error;products=data.map(fromRow);DB='ok'}catch(e){DB='err';toast('Base injoignable : produits de démonstration affichés')}
@@ -566,7 +566,7 @@ document.addEventListener('error',e=>{const i=e.target;if(!i||i.tagName!=='IMG'|
 /* ===== v7 : vidéos, réglages d’accueil, commandes ===== */
 const VID=new Set(),isVid=u=>VID.has(u)||/\.(mp4|mov|m4v|webm)(\?|$)/i.test(u||'');
 const vthumb=u=>`<video src='${esc(mSrc(u))}' muted playsinline preload='metadata'></video><i class='pl'>▶</i>`;
-const mediaTag=u=>isVid(u)?`<video src='${esc(mSrc(u))}' controls playsinline preload='metadata'></video>`:`<img src='${esc(u)}' alt=''>`;
+const mediaTag=u=>(window.__lkOn&&window.__lkOn())?window.__lkB():mediaTag0(u);const mediaTag0=u=>isVid(u)?`<video src='${esc(mSrc(u))}' controls playsinline preload='metadata'></video>`:`<img src='${esc(u)}' alt=''>`;
 const cfgGet=()=>{const d={on:true,dur:3,logo:''};try{return Object.assign(d,JSON.parse(localStorage.getItem('skf_cfg')||'{}'))}catch(e){return d}};
 const cfgSet=c=>{try{localStorage.setItem('skf_cfg',JSON.stringify(c))}catch(e){}};
 function splashMs(){let c={on:true,dur:3};try{c=Object.assign(c,JSON.parse(localStorage.getItem('skf_cfg')||'{}'))}catch(e){}document.documentElement.style.setProperty('--d',c.dur+'s');return c.on?c.dur*1000:0}
@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='22 oct. · 03h00 · Kiffance complet';
+var APP_V='22 oct. · 16h00 · Verrou médias';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3246,6 +3246,98 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
   if(!confirm('Effacer ce visiteur de la liste ?'))return;var id=d.dataset.vsdel;
   try{var x=await sb.from('visits').delete().eq('tg_id',id);if(x&&x.error)throw x.error;var y=await sb.from('visit_days').delete().eq('tg_id',id);if(y&&y.error)throw y.error;toast('Visiteur effacé.');view()}catch(er){toast('Échec : '+((er&&er.message)||er))}},true);
  window.__vis={view:view,on:on};
+})();
+</script>
+<style id="lkcss">
+.ph:has(>.lkt){position:relative}
+.lkt{position:absolute!important;inset:0;display:flex!important;align-items:center;justify-content:center;width:auto!important;height:auto!important;background:radial-gradient(circle at 50% 40%,#16302a,#08130f);color:#b5f23d;font-size:34px;cursor:pointer}
+.ph .lkt{border-radius:inherit}
+.line .ph .lkt,.cpit .ph .lkt,.rc .ph .lkt{font-size:22px}
+.lkb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:230px;width:100%;flex:0 0 100%;box-sizing:border-box;padding:22px 16px;border-radius:18px;border:1.5px dashed var(--bd,#23376e);background:radial-gradient(circle at 50% 30%,#16302a,#08130f);color:#fff;text-align:center;cursor:pointer}
+.lkb .lki{font-size:54px;line-height:1}
+.lkb b{font-size:17px}
+.lkb span{font-size:13px;color:#cfe0d8;max-width:260px}
+.lkb em{font-style:normal;margin-top:4px;padding:10px 18px;border-radius:999px;background:var(--glow,#1fa35a);color:#04120b;font-weight:900;font-size:14px}
+.gal .lkb ~ .lkb{display:none}
+#lkm{position:fixed;inset:0;z-index:100050;background:rgba(2,8,6,.82);display:none;align-items:center;justify-content:center;padding:18px}
+#lkm.show{display:flex}
+#lkm .lkc{position:relative;width:100%;max-width:340px;background:var(--card,#0d1a15);border:1.5px solid var(--bd,#23376e);border-radius:22px;padding:26px 18px 18px;text-align:center;color:#fff;box-shadow:0 0 30px rgba(31,163,90,.25)}
+#lkm .lkx{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;border:0;background:#0006;color:#fff;font-size:17px}
+#lkm .lkn{font-size:46px;line-height:1}
+#lkm h3{margin:8px 0 6px;font-size:19px}
+#lkm p{margin:0 0 14px;font-size:14px;color:#cfe0d8}
+#lkm .lkw{display:flex;width:100%;box-sizing:border-box;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:999px;border:1.5px solid var(--glow,#1fa35a);background:transparent;color:var(--glow,#1fa35a);font-weight:900;font-size:15px;margin:0 0 14px}
+#lkm input{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:14px;border:1.5px solid var(--bd,#23376e);background:rgba(255,255,255,.05);color:#fff;font-size:17px;text-align:center;letter-spacing:.06em;margin:0 0 10px}
+#lkm .lkg{display:block;width:100%;padding:14px;border-radius:999px;border:0;background:var(--glow,#1fa35a);color:#04120b;font-weight:900;font-size:16px}
+#lkm .lke{min-height:18px;margin:8px 0 0;font-size:13px;color:#ff7b7b}
+</style>
+<script>
+(function(){
+ var ID='mlock',KEY='skf_mlk';
+ function cfgOn(){try{return cfgV(ID).on===true}catch(e){return false}}
+ function admin(){try{return !!IS_ADMIN}catch(e){return false}}
+ var unl=null;
+ try{unl=localStorage.getItem(KEY)}catch(e){}
+ function isOn(){return cfgOn()&&!admin()&&unl===null}
+ window.__lkOn=isOn;
+ window.__lkT=function(){return '<span class="lkt" data-lk="1" role="button" aria-label="Contenu verrouillé">🔒</span>'};
+ window.__lkB=function(){return '<div class="lkb" data-lk="1" role="button"><div class="lki">🔒</div><b>Contenu verrouillé</b><span>Écrivez-nous pour avoir votre code pour déverrouiller.</span><em>Entrer mon code</em></div>'};
+ /* ----- réglage admin ----- */
+ try{var sx=CSEC.find(function(x){return x.items.some(function(i){return i.k==='abd'})})||CSEC.find(function(x){return x.id==='fd'});
+  if(sx&&!sx.items.some(function(i){return i.k===ID}))sx.items.unshift({k:ID,tg:1,def:0,ic:'🔒',t:'Verrouillage photos et vidéos',d:'Les clients voient un cadenas à la place des photos/vidéos, jusqu’à ce qu’ils tapent le code que tu leur donnes. Interrupteur = activer / désactiver. Touche la ligne pour choisir le code.',f:[]})}catch(e){}
+ /* ----- fenêtre client ----- */
+ var pid=null;
+ function box(){var m=document.getElementById('lkm');if(m)return m;m=document.createElement('div');m.id='lkm';
+  m.innerHTML='<div class="lkc"><button class="lkx" aria-label="Fermer" data-lkx>✕</button><div class="lkn">🔒</div><h3>Contenu verrouillé</h3><p>Écrivez-nous pour avoir votre code pour déverrouiller.</p><button class="lkw" data-lkw>✉️ Nous écrire</button><input id="lki" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="40" placeholder="Votre code"><button class="lkg" data-lkg>Déverrouiller</button><div class="lke" id="lke"></div></div>';
+  document.body.appendChild(m);return m}
+ function show(){var m=box();document.getElementById('lke').textContent='';document.getElementById('lki').value='';m.classList.add('show');setTimeout(function(){try{document.getElementById('lki').focus()}catch(e){}},80)}
+ function hide(){var m=document.getElementById('lkm');if(m)m.classList.remove('show')}
+ function msg(t){var e=document.getElementById('lke');if(e)e.textContent=t}
+ function redraw(){hide();try{render()}catch(e){}if(pid){var i=pid;pid=null;try{openP(i)}catch(e){}}}
+ async function tryCode(){var c=(document.getElementById('lki').value||'').trim();if(!c){msg('Tape ton code.');return}
+  var b=document.querySelector('#lkm [data-lkg]');b.disabled=true;msg('');
+  try{var v=null;
+   if(typeof sb!=='undefined'&&sb){var r=await sb.rpc('media_unlock',{c:c});if(r.error)throw r.error;v=r.data}
+   else v=(c.toLowerCase()==='1234')?1:null;
+   if(v===null||v===undefined){msg('Code incorrect.');b.disabled=false;return}
+   unl=String(v);try{localStorage.setItem(KEY,unl)}catch(e){}
+   try{toast('Déverrouillé ✅')}catch(e){}redraw()}
+  catch(e){msg(String((e&&e.message)||'Impossible de vérifier, réessaie.').slice(0,120));b.disabled=false}}
+ function support(){try{var u=CFG.support;if(!u||!/^https:\/\/(t|telegram)\.me\//.test(u)){try{toast('Lien Support à ajouter dans config.js')}catch(e){}return}
+  try{Telegram.WebApp.openTelegramLink(u)}catch(e){window.open(u,'_blank','noopener')}}catch(e){}}
+ document.addEventListener('click',function(e){var t=e.target;if(!t||!t.closest)return;
+  if(t.closest('[data-lkx]')||t===document.getElementById('lkm')){hide();return}
+  if(t.closest('[data-lkw]')){e.preventDefault();support();return}
+  if(t.closest('[data-lkg]')){e.preventDefault();tryCode();return}
+  var l=t.closest('[data-lk]');if(l&&isOn()){e.preventDefault();e.stopPropagation();
+   var c=l.closest('[data-open]');pid=c?c.getAttribute('data-open'):null;
+   if(!pid){var s=document.getElementById('pS');var g=l.closest('.gal');if(g&&s&&window.__lkPid)pid=window.__lkPid}
+   show()}},true);
+ document.addEventListener('keydown',function(e){if(e.key==='Enter'&&document.activeElement&&document.activeElement.id==='lki'){e.preventDefault();tryCode()}});
+ /* mémorise le produit ouvert pour le rouvrir après déverrouillage */
+ try{var _op=openP;openP=function(id){window.__lkPid=id;return _op.apply(this,arguments)}}catch(e){}
+ /* le code a changé côté serveur → on reverrouille */
+ async function chk(){try{if(unl===null||typeof sb==='undefined'||!sb||!cfgOn())return;var r=await sb.rpc('media_lock_ver');if(r&&!r.error&&r.data!=null&&String(r.data)!==unl){unl=null;try{localStorage.removeItem(KEY)}catch(e){}try{render()}catch(e){}}}catch(e){}}
+ setTimeout(chk,2500);document.addEventListener('visibilitychange',function(){if(!document.hidden)chk()});
+ /* ----- écran admin ----- */
+ async function view(){if(!admin())return;
+  aShow('<h2>🔒 Verrouillage photos et vidéos</h2><p class="note">Chargement…</p>');
+  var code='',err='';
+  try{if(typeof sb==='undefined'||!sb)throw new Error('Base non connectée (mode démo : code 1234)');var r=await sb.rpc('media_lock_get');if(r.error)throw r.error;code=r.data||''}catch(e){err=String((e&&e.message)||e).slice(0,140)}
+  var on=cfgOn();
+  aShow('<h2>🔒 Verrouillage photos et vidéos</h2>'
+   +'<p class="note">État : <b>'+(on?'ACTIVÉ ✅':'désactivé')+'</b> (interrupteur de la ligne, dans la liste des réglages). Toi, en tant qu’admin, tu vois toujours tout.</p>'
+   +(err?'<p class="note">Impossible de lire le code : '+esc(err)+'<br>Vérifie que le SQL « 24-verrouillage-medias » a été exécuté.</p>':'')
+   +'<label class="note" style="text-align:left;display:block">Code à donner aux clients</label>'
+   +'<input id="lkcode" type="text" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(code)+'" placeholder="ex : plante42" style="width:100%;box-sizing:border-box;padding:12px;border-radius:12px;border:1.5px solid var(--bd);background:rgba(255,255,255,.05);color:#fff;font-size:16px;margin:6px 0 10px">'
+   +'<button class="btn" data-lksave>💾 Enregistrer le code</button>'
+   +'<p class="note" style="text-align:left;font-size:12px">Changer le code reverrouille tous les clients (ils devront retaper le nouveau). Les majuscules ne comptent pas. Sans code enregistré, personne ne peut déverrouiller.<br>⚠️ Le verrou cache les médias dans l’appli. Il n’empêche pas quelqu’un de technique de retrouver les liens des fichiers : ne mets pas de contenu vraiment secret en ligne.</p>')}
+ document.addEventListener('click',async function(e){var b=e.target.closest&&e.target.closest('[data-lksave]');if(!b||!admin())return;e.preventDefault();e.stopPropagation();
+  var c=(document.getElementById('lkcode').value||'').trim();b.disabled=true;
+  try{if(typeof sb==='undefined'||!sb)throw new Error('Base non connectée');var r=await sb.rpc('media_lock_set',{c:c});if(r.error)throw r.error;toast(c?'Code enregistré ✅':'Code effacé (personne ne peut déverrouiller)');view()}
+  catch(er){toast('Échec : '+String((er&&er.message)||er).slice(0,100));b.disabled=false}},true);
+ var _cf=cfgForm;cfgForm=function(k){if(k===ID){view();return}return _cf.apply(this,arguments)};
+ window.__lk={on:isOn,view:view};
 })();
 </script>
 <style id="pccss">
