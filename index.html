@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SHOP DLA KIFFANCE</title><meta name="theme-color" content="#04050a"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://telegram.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://tiles.openfreemap.org https://tile.openstreetmap.org https://tiles.openfreemap.org; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api-adresse.data.gouv.fr https://router.project-osrm.org https://routing.openstreetmap.de https://tiles.openfreemap.org https://cdn.jsdelivr.net; worker-src blob:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="referrer" content="no-referrer"><script src="config.js"></script>
+<title>SHOP DLA KIFFANCE</title><meta name="theme-color" content="#04050a"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://telegram.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://tiles.openfreemap.org https://tile.openstreetmap.org https://tiles.openfreemap.org; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api-adresse.data.gouv.fr https://router.project-osrm.org https://routing.openstreetmap.de https://tiles.openfreemap.org https://cdn.jsdelivr.net; worker-src blob:; frame-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="referrer" content="no-referrer"><script src="config.js"></script>
 <style>
 :root{--bg:#040a07;--card:#0c2215;--card2:#11331f;--blue:#1fa35a;--glow:#b5f23d;--mrgb:31,163,90;--srgb:181,242,61;--tx:#eefff4;--mu:#8bc4a0;--ok:#35e0a1;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -1334,7 +1334,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-theme],[da
  if('pvedit' in d){$('#ovA').classList.add('show');return openTheme()}
  if('pvquit' in d){PVT=null;hidePvBar();applyTheme()}});
 applyTheme();window.__theme=loadTheme();
-save();render();window.__prod=loadProducts();introStart();
+save();render();window.__prod=loadProducts();window.__introRun=function(){try{if(window.__introVid&&window.__introVid())return}catch(e){}introStart()};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',window.__introRun);else window.__introRun();
 (function(){const mk=$('.mk'),hl=$('#hlg');if(!mk||!hl)return;const cp=()=>{hl.innerHTML=mk.innerHTML;hl.querySelectorAll('video').forEach(v=>{v.muted=true;try{v.play()}catch(e){}})};cp();new MutationObserver(cp).observe(mk,{childList:true,subtree:true,attributes:true})})();
 var ocf_dummy=0;
 /* ===== Commandes et livraison (réglages admin + effets côté client) ===== */
@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='22 oct. · 16h00 · Verrou médias';
+var APP_V='22 oct. · 19h00 · Loader moto';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3338,6 +3338,78 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
   catch(er){toast('Échec : '+String((er&&er.message)||er).slice(0,100));b.disabled=false}},true);
  var _cf=cfgForm;cfgForm=function(k){if(k===ID){view();return}return _cf.apply(this,arguments)};
  window.__lk={on:isOn,view:view};
+})();
+</script>
+<style id="kvcss">
+#intro.kvm #pc,#intro.kvm .vig,#intro.kvm .stage,#intro.kvm .ld{display:none!important}
+#intro .kv{display:none}
+#intro.kvm .kv{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#04050a;padding-top:env(safe-area-inset-top,0px)}
+#intro .kvx{display:none}
+#intro .kvv{position:relative;flex:0 1 auto;width:100%;max-width:calc((100vh - 230px)*.8028);aspect-ratio:464/578;overflow:hidden;-webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
+@supports (height:100dvh){#intro .kvx{display:none}
+#intro .kvv{max-width:calc((100dvh - 230px)*.8028)}}
+#intro .kvv video{position:absolute;left:0;top:0;width:100%;height:auto;display:block;background:#04050a}
+#intro .kvbt{flex:none;width:100%;box-sizing:border-box;padding:6px 22px calc(22px + env(safe-area-inset-bottom,0px));text-align:center}
+#intro .kvt{font:900 clamp(22px,7.4vw,34px)/1.05 "Arial Black",Impact,system-ui,sans-serif;letter-spacing:.04em;color:#e8ffd0;text-shadow:0 0 10px rgba(181,242,61,.55),0 0 26px rgba(31,163,90,.55),0 2px 0 #04120b}
+#intro .kvt b{display:block;color:#b5f23d}
+#intro .kvp{margin:14px auto 8px;width:min(78%,320px);height:10px;border-radius:8px;background:#0d2a1d;border:1.5px solid #1fa35a;overflow:hidden}
+#intro .kvp i{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#1fa35a,#b5f23d);border-radius:8px}
+#intro .kvm2{font:700 12px/1.2 system-ui,sans-serif;color:#9fc7b0;letter-spacing:.08em;text-transform:uppercase;min-height:14px}
+#intro .kvs{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));right:12px;z-index:3;padding:9px 14px;border-radius:999px;border:1.5px solid rgba(181,242,61,.55);background:rgba(4,12,8,.6);color:#e8ffd0;font:800 13px/1 system-ui,sans-serif;opacity:0;transition:opacity .3s;-webkit-tap-highlight-color:transparent}
+#intro .kvs.on{opacity:1}
+#intro .kvn{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:12px;z-index:3;width:38px;height:34px;padding:0;border-radius:999px;border:1.5px solid rgba(181,242,61,.55);background:rgba(4,12,8,.6);color:#e8ffd0;font:16px/1 system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+@media (prefers-reduced-motion:reduce){#intro .kvs{transition:none}}
+#intro.kvm .kv{padding:0}
+#intro .kvf{position:absolute;inset:0;width:100%;height:100%;border:0;background:#05050d;z-index:1}
+#intro .kvbt{position:absolute;left:0;right:0;bottom:0;z-index:2;pointer-events:none;background:linear-gradient(transparent,rgba(5,5,13,.85) 55%)}
+#intro .kvt{font-size:clamp(16px,5.2vw,24px)}
+</style>
+<script>
+(function(){
+ var SRC='intro-loader.html',LS='skf_introv',CAP=9500,WAIT_LOAD=2500,MINRUN=800;
+ function today(){try{return new Date().toISOString().slice(0,10)}catch(e){return''}}
+ function seenToday(){try{return localStorage.getItem(LS)===today()}catch(e){return false}}
+ function mark(){try{localStorage.setItem(LS,today())}catch(e){}}
+ function slowNet(){try{var c=navigator.connection||navigator.mozConnection||navigator.webkitConnection;return !!(c&&(c.saveData||/^(slow-2g|2g)$/.test(c.effectiveType||'')))}catch(e){return false}}
+ function reduced(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
+ window.__introVid=function(){
+  var el=document.getElementById('intro');if(!el)return false;
+  var cfg;try{cfg=cfgGet()}catch(e){cfg={on:true}}
+  if(!cfg.on||(typeof iaNone==='function'&&iaNone()))return false;      /* intro désactivée dans l'admin : comportement d'origine */
+  if(reduced())return false;                                              /* réduction des animations : intro d'origine */
+  if(seenToday())return false;                                            /* une fois par jour */
+  if(slowNet()){mark();el.style.display='none';introEnd(true);return true}   /* connexion lente : boutique directe */
+  var done=false,t0=performance.now(),loaded=false,fin=false,finEnd=false;
+  var kv=document.createElement('div');kv.className='kv';
+  kv.innerHTML='<iframe class="kvf" title="Chargement" tabindex="-1" aria-hidden="true"></iframe><button class="kvs" type="button" aria-label="Passer l’animation">Passer ›</button><div class="kvbt"><div class="kvt">SHOP DLA <b style="display:inline">KIFFANCE</b></div><div class="kvp"><i></i></div><div class="kvm2">Préparation de votre boutique…</div></div>';
+  el.appendChild(kv);el.classList.add('kvm');
+  var fr=kv.querySelector('iframe'),bar=kv.querySelector('.kvp i'),txt=kv.querySelector('.kvm2'),sk=kv.querySelector('.kvs');
+  var st={set:0,prod:0,img:0},w={set:.25,prod:.45,img:.30};
+  Promise.resolve(window.__set).then(function(){st.set=1},function(){st.set=2});
+  Promise.resolve(window.__prod).then(function(){st.prod=(typeof DB!=='undefined'&&DB==='err')?2:1;
+   var u=[];try{u=products.slice(0,6).map(function(p){return p.ph&&p.ph[0]}).filter(function(x){return x&&!isVid(x)})}catch(e){}
+   if(!u.length){st.img=1;return}
+   return Promise.race([Promise.all(u.map(function(x){return new Promise(function(r){var i=new Image();i.onload=i.onerror=function(){r()};i.src=x})})).then(function(){st.img=1}),new Promise(function(r){setTimeout(function(){if(st.img!==1)st.img=2;r()},2500)})])},function(){st.prod=2;st.img=2});
+  function res(){var d=0,t=0;for(var k in w){if(st[k]===2)continue;t+=w[k];if(st[k]===1)d+=w[k]}return t?d/t:1}
+  function K(){try{return fr.contentWindow.KLD}catch(e){return null}}
+  function leave(instant){if(done)return;done=true;mark();try{fr.contentWindow.LDsnd&&fr.contentWindow.LDsnd.stop()}catch(e){}try{fr.removeAttribute('src')}catch(e){}
+   if(instant){el.style.display='none';introEnd(true)}else{introEnd(false)}}
+  function fallback(){leave(true)}
+  sk.addEventListener('click',function(e){e.stopPropagation();leave(false)});
+  setTimeout(function(){sk.classList.add('on')},400);
+  fr.addEventListener('load',function(){var k=K();if(!k){fallback();return}loaded=true;try{k.start()}catch(e){}});
+  setTimeout(function(){if(!done&&!loaded)fallback()},WAIT_LOAD);
+  fr.src=SRC;
+  document.addEventListener('visibilitychange',function(){if(done)return;try{var s=fr.contentWindow.LDsnd;if(document.hidden&&s)s.stop()}catch(e){}});
+  var shown=0,last=t0;
+  (function f(now){if(done)return;requestAnimationFrame(f);var dt=Math.min(100,now-last);last=now;var e=now-t0;
+   if(loaded&&!fin&&res()>=.999&&e>=MINRUN){fin=true;var k=K();try{k.finish(function(){finEnd=true})}catch(x){fallback();return}}
+   var g=finEnd?1:.5*res()+.5*Math.min(.97,e/6500);
+   shown=Math.min(g,shown+dt/1000*.6);bar.style.transform='scaleX('+shown+')';
+   var m=shown>=.999?'Bienvenue':shown>.6?'Presque prêt…':'Préparation de votre boutique…';if(txt.textContent!==m)txt.textContent=m;
+   if(finEnd||e>=CAP){leave(false)}})(t0);
+  return true};
+ window.__introVidInfo={SRC:SRC};
 })();
 </script>
 <style id="pccss">
