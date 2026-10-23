@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SHOP DLA KIFFANCE</title><meta name="theme-color" content="#04050a"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://telegram.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://tiles.openfreemap.org https://tile.openstreetmap.org https://tiles.openfreemap.org; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api-adresse.data.gouv.fr https://router.project-osrm.org https://routing.openstreetmap.de https://tiles.openfreemap.org https://cdn.jsdelivr.net; worker-src blob:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="referrer" content="no-referrer"><script src="config.js"></script>
+<title>SHOP DLA KIFFANCE</title><meta name="theme-color" content="#04050a"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://telegram.org; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://tiles.openfreemap.org https://tile.openstreetmap.org https://tiles.openfreemap.org; media-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api-adresse.data.gouv.fr https://data.geopf.fr https://router.project-osrm.org https://routing.openstreetmap.de https://tiles.openfreemap.org https://cdn.jsdelivr.net; worker-src blob:; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="referrer" content="no-referrer"><script src="config.js"></script>
 <style>
 :root{--bg:#040a07;--card:#0c2215;--card2:#11331f;--blue:#1fa35a;--glow:#b5f23d;--mrgb:31,163,90;--srgb:181,242,61;--tx:#eefff4;--mu:#8bc4a0;--ok:#35e0a1;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='22 oct. · 23h00 · Loader fluide';
+var APP_V='23 oct. · 14h50 · Adresse suggérée';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -4140,7 +4140,7 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
  /* géocodage de l'adresse du client (base nationale d'adresses, France) */
  function geocode(o){var q=[o.address,o.zip,o.city].filter(Boolean).join(' ');if(!q||o.city==='Meetup')return Promise.resolve(null);
   var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){try{ctl&&ctl.abort()}catch(e){}},7000);
-  return fetch('https://api-adresse.data.gouv.fr/search/?limit=1&q='+encodeURIComponent(q),ctl?{signal:ctl.signal}:{}).then(function(r){return r.json()}).then(function(j){clearTimeout(tm);var f=j&&j.features&&j.features[0];if(!f||!f.geometry||(f.properties&&f.properties.score<.4))return null;return{lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]}}).catch(function(){clearTimeout(tm);return null})}
+  return fetch('https://data.geopf.fr/geocodage/search/?limit=1&q='+encodeURIComponent(q),ctl?{signal:ctl.signal}:{}).then(function(r){return r.json()}).then(function(j){clearTimeout(tm);var f=j&&j.features&&j.features[0];if(!f||!f.geometry||(f.properties&&f.properties.score<.4))return null;return{lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]}}).catch(function(){clearTimeout(tm);return null})}
  /* ----- moteur GPS (démarre UNIQUEMENT sur un appui, jamais tout seul, jamais mémorisé) ----- */
  function wake(){try{if(navigator.wakeLock&&!GP.wl)navigator.wakeLock.request('screen').then(function(l){GP.wl=l;l.addEventListener('release',function(){GP.wl=null})}).catch(function(){})}catch(e){}}
  function unwake(){try{GP.wl&&GP.wl.release()}catch(e){}GP.wl=null}
@@ -4226,6 +4226,50 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
 .hd{top:3px;width:52px;height:52px;border-radius:16px;background:linear-gradient(180deg,#fff,#e9e9f2);box-shadow:0 0 0 5px #8a8a1c88,0 0 22px #c9cf2e88}
 .okv{background:#2a3a0899;text-shadow:0 0 24px #e8e03a}
 </style>
+<script>
+/* ---- adresse : le client tape sa rue, il clique sur une suggestion (adresse + code postal + ville) ---- */
+(function(){
+var URL_='https://data.geopf.fr/geocodage/search/',tm=0,ctl=null,cache={},skip=0,last='';
+function esc2(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim()}
+function frOk(){var y=document.querySelector('#cy');if(!y)return true;var v=norm(y.value);return v===''||v==='france'}
+function close(){var b=document.querySelector('#ads');if(b)b.remove()}
+function show(list){var ca=document.querySelector('#ca');if(!ca||document.activeElement!==ca){return}
+ var box=document.querySelector('#ads');
+ if(!list.length){if(box)box.remove();return}
+ if(!box){box=document.createElement('div');box.id='ads';box.style.cssText='margin:4px 0 8px';ca.insertAdjacentElement('afterend',box)}
+ box.innerHTML=list.map(function(a,i){return '<button type="button" data-apick="'+i+'" style="display:block;width:100%;text-align:left;padding:10px 12px;margin:4px 0;border-radius:12px;background:#0d1330;border:1px solid #2a4fb0;color:#fff;font-size:15px">'+esc2(a.l)+' <small style="color:var(--mu)">'+esc2(a.z+' '+a.c)+'</small></button>'}).join('');
+ box._l=list}
+function parse(j){var out=[],f=(j&&j.features)||[];
+ for(var i=0;i<f.length;i++){var p=f[i].properties||{};var l=p.name||'',z=p.postcode||'',c=p.city||'';
+  if(!l||!/^\d{5}$/.test(z)||!c)continue;
+  if(out.some(function(x){return x.l===l&&x.z===z&&x.c===c}))continue;
+  out.push({l:l,z:z,c:c})}
+ return out.slice(0,5)}
+function ask(q){
+ if(cache[q]){show(cache[q]);return}
+ if(ctl)try{ctl.abort()}catch(e){}
+ ctl=typeof AbortController==='function'?new AbortController():null;
+ var tt=setTimeout(function(){if(ctl)try{ctl.abort()}catch(e){}},6000);
+ fetch(URL_+'?limit=5&autocomplete=1&q='+encodeURIComponent(q),ctl?{signal:ctl.signal}:{}).then(function(r){return r.json()}).then(function(j){clearTimeout(tt);var l=parse(j);cache[q]=l;if(q===last)show(l)}).catch(function(){clearTimeout(tt)})}
+document.addEventListener('input',function(e){if(!e.target||e.target.id!=='ca')return;
+ if(Date.now()<skip)return;clearTimeout(tm);
+ var q=e.target.value.trim();last=q;
+ if(q.length<4||!frOk()){close();return}
+ tm=setTimeout(function(){ask(q)},280)});
+document.addEventListener('focusin',function(e){if(e.target&&e.target.id==='ca'&&e.target.value.trim().length>=4&&frOk()&&cache[e.target.value.trim()]){last=e.target.value.trim();show(cache[last])}});
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-apick]');
+ if(b){e.preventDefault();e.stopPropagation();var box=document.querySelector('#ads'),a=box&&box._l&&box._l[+b.dataset.apick];if(!a)return;
+  var ca=document.querySelector('#ca'),cz=document.querySelector('#cz'),cv=document.querySelector('#cv'),cy=document.querySelector('#cy');
+  skip=Date.now()+800;
+  function set(el,v){if(!el)return;el.value=v;el.classList.remove('bad');var er=document.querySelector('#e-'+el.id);if(er)er.textContent='';try{el.dispatchEvent(new Event(el.id==='ca'?'input':'change',{bubbles:true}))}catch(x){}}
+  set(ca,a.l);set(cz,a.z);set(cv,a.c);if(cy&&!cy.value.trim())set(cy,'France');
+  close();var v=document.querySelector('#vls');if(v)v.remove();
+  try{if(window.VILLE_OK)VILLE_OK()}catch(x){}
+  return}
+ if(!(e.target.closest&&e.target.closest('#ca,#ads')))close()},true);
+})();
+</script>
 <style id="ps-css">
 #pS .psh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-top:14px;text-align:left}
 #pS .psh h2{margin:0;font-size:22px;text-transform:uppercase;line-height:1.15;flex:1;min-width:0;overflow-wrap:anywhere}
