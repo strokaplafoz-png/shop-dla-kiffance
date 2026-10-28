@@ -2141,7 +2141,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
 document.addEventListener('change',e=>{if(e.target&&e.target.id==='cv')VILLE_OK()});
 
 /* ---- repère de version (visible seulement pour le propriétaire connecté) ---- */
-var APP_V='23 oct. · 14h50 · Adresse suggérée';
+var APP_V='28 oct. · 15h30 · Commandes GPS';
 (function(){const el=document.createElement('div');el.id='appv';el.style.cssText='position:fixed;left:8px;bottom:4px;z-index:5;font-size:9px;opacity:.55;color:#9fb4e8;pointer-events:none;display:none';el.textContent='v. '+APP_V;document.body.appendChild(el);
  setInterval(()=>{try{el.style.display=(IS_ADMIN&&!document.querySelector('#ovA.show'))?'block':'none'}catch(e){}},1500)})();
 
@@ -3812,6 +3812,84 @@ body.lite nav#nav button[data-v=cart].abd span{animation:none}
  document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('[data-oatest]');if(!t)return;e.preventDefault();e.stopPropagation();unlock();
   alertNew({id:'t',total:49.9,name:'Client test',items:[{q:2}],city:'Paris'},true)},true);
  window.__oa={onRow:onRow,test:function(){alertNew({id:'t',total:49.9,name:'Client test',items:[{q:2}],city:'Paris'},true)},sub:sub,chime:chime,missed:function(){return missed}};
+})();
+</script>
+<style id="ordcss">
+.ost{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 10px}
+.ost div{background:var(--card,#1b1d28);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 6px;text-align:center}
+.ost b{display:block;font-size:20px}.ost small{opacity:.75;font-size:11px}
+.ocd{border-left:5px solid var(--oc,#555)!important;padding:0!important;overflow:hidden}
+.ocd>summary{list-style:none;cursor:pointer;padding:12px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.ocd>summary::-webkit-details-marker{display:none}
+.ocd .ob{padding:0 12px 12px}
+.ocd .sb{display:inline-block;color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;white-space:nowrap}
+.ocd .nw{background:#ff3b5c;color:#fff;border-radius:8px;padding:1px 6px;font-size:10px;font-weight:800;margin-left:6px;animation:ordp 1.4s infinite}
+@keyframes ordp{50%{opacity:.45}}
+.onx{width:100%;margin:10px 0 6px;font-size:16px;padding:14px}
+.otl{display:flex;gap:4px;margin:8px 0}
+.otl i{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.14)}
+.otl i.on{background:var(--oc,#1fa35a)}
+</style>
+<script>
+(function(){
+ var FLOW=['nouvelle','confirmée','payée','préparée','expédiée','livrée'];
+ var NXT={nouvelle:'✅ Confirmer la commande',confirmée:'💶 Marquer payée',payée:'📦 Marquer préparée',préparée:'🚚 Marquer expédiée',expédiée:'🏁 Marquer livrée'};
+ var TODO=['nouvelle','confirmée','payée','préparée'];
+ IN.op=IN.op||{};IN.cx=null;
+
+ function ago(d){var m=Math.round((Date.now()-new Date(d).getTime())/6e4);if(isNaN(m))return'';if(m<1)return'à l’instant';if(m<60)return'il y a '+m+' min';var h=Math.round(m/60);if(h<24)return'il y a '+h+' h';var j=Math.round(h/24);return'il y a '+j+' j'}
+ function sameDay(a){var x=new Date(a),n=new Date();return x.getFullYear()===n.getFullYear()&&x.getMonth()===n.getMonth()&&x.getDate()===n.getDate()}
+ function match(o){var q=(IN.q||'').toLowerCase().trim();
+  var okF=IN.f==='all'||(IN.f==='todo'?TODO.indexOf(o.status)>-1:o.status===IN.f);
+  if(!okF)return false;if(!q)return true;
+  return [o.name,o.phone,o.id,o.city,o.zip,o.address,o.tg,(o.items||[]).map(function(i){return i.name}).join(' ')].join(' ').toLowerCase().indexOf(q)>-1}
+ inCard=function(o){var rq=kcReq(o.phone),b=rq?(rq.status==='ok'?'✅ CNI vérifiée':rq.status==='no'?'⛔ CNI refusée':'⏳ CNI à examiner'):'';
+  var col=OCOL[o.status]||'#555',idx=FLOW.indexOf(o.status),nitems=(o.items||[]).reduce(function(a,i){return a+(+i.q||1)},0);
+  var fresh=o.status==='nouvelle'&&(Date.now()-new Date(o.created_at).getTime())<864e5;
+  var open=IN.op[o.id]!==undefined?IN.op[o.id]:(o.status==='nouvelle');
+  var tg=String(o.tg||'').replace(/^@/,''),addr=[o.address,[o.zip,o.city].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  var A='margin:0;text-decoration:none;text-align:center';
+  return '<details class="box ocd" style="text-align:left;--oc:'+col+'" id="o'+esc(o.id)+'" data-oid="'+esc(o.id)+'"'+(open?' open':'')+'>'
+  +'<summary><div><b>'+esc(o.name||'Client')+'</b>'+(fresh?'<span class="nw">NOUVEAU</span>':'')+'<div class="note" style="margin:2px 0 0">N° '+esc(o.id)+' · '+ago(o.created_at)+' · '+nitems+' article'+(nitems>1?'s':'')+'</div></div>'
+  +'<div style="text-align:right"><b>'+eur(o.total)+'</b><br><span class="sb" style="background:'+col+'">'+esc(o.status)+'</span></div></summary>'
+  +'<div class="ob">'+(idx>-1?'<div class="otl">'+FLOW.map(function(_,i){return'<i class="'+(i<=idx?'on':'')+'"></i>'}).join('')+'</div>':'')
+  +'<div class="note" style="margin:0 0 6px">'+new Date(o.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})+(o.pay?' · 💳 '+esc(o.pay):'')+(o.paycode?' · '+esc(o.paycode):'')+'</div>'
+  +'<div>'+esc(o.phone)+(o.tg?' · '+esc(o.tg):'')+(b?' <span class="note">'+b+'</span>':'')+'</div>'
+  +'<small>'+esc(addr)+(o.notes?'<br>📝 '+esc(o.notes):'')+'</small>'
+  +'<div class="note" style="margin-top:6px;padding:8px;border-radius:10px;background:rgba(255,255,255,.05)">'+(o.items||[]).map(function(i){return'<b>'+i.q+'×</b> '+esc(i.name)}).join('<br>')+'</div>'
+  +((o.tracking||o.carrier)?'<div class="note">📦 '+esc(o.carrier||'')+' '+esc(o.tracking||'')+'</div>':'')
+  +(NXT[o.status]?'<button class="btn onx" data-ino="'+esc(o.id)+'">'+NXT[o.status]+'</button>':'')
+  +'<div class="two"><a class="btn alt" style="'+A+'" href="tel:'+esc(dgt(o.phone))+'">📞 Appeler</a><a class="btn alt" style="'+A+'" target="_blank" rel="noopener" href="https://wa.me/'+esc(dgt(o.phone))+'">💬 WhatsApp</a></div>'
+  +'<div class="two" style="margin-top:8px">'+(tg?'<a class="btn alt" style="'+A+'" target="_blank" rel="noopener" href="https://t.me/'+esc(tg)+'">✈️ Telegram</a>':'<button class="btn alt" style="margin:0" data-incp="'+esc(o.id)+'">📋 Copier adresse</button>')
+  +(addr?'<a class="btn alt" style="'+A+'" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr)+'">🗺️ Itinéraire</a>':'')+'</div>'
+  +(tg?'<button class="btn alt" style="margin-top:8px" data-incp="'+esc(o.id)+'">📋 Copier l’adresse</button>':'')
+  +'<label class="fl" style="margin-top:10px">Changer le statut à la main</label><select data-inst="'+esc(o.id)+'">'+OST.map(function(s){return'<option '+(s===o.status?'selected':'')+'>'+s+'</option>'}).join('')+'</select>'
+  +(o.status!=='annulée'&&o.status!=='livrée'?'<button class="btn alt" style="margin-top:8px;color:#ff6b81" data-inx="'+esc(o.id)+'">'+(IN.cx===o.id?'⚠️ Appuie encore pour annuler':'❌ Annuler la commande')+'</button>':'')
+  +'</div></details>'};
+ function rstT(){try{var v=cfgAll().ordRst;return v?new Date(v).getTime():0}catch(e){return 0}}
+ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-ordrst]');if(!b)return;e.preventDefault();e.stopPropagation();
+  if(b.dataset.ordrst==='x'){delete cfgAll().ordRst;cfgSv();IN.rp=false;return inDraw()}
+  if(!IN.rp){IN.rp=true;inDraw();setTimeout(function(){if(IN.rp){IN.rp=false;try{inDraw()}catch(_){}}},5000);return}
+  IN.rp=false;cfgAll().ordRst=new Date().toISOString();cfgSv();toast('Compteurs remis à 0 ✓');inDraw()},true);
+ inDraw=function(focus){var L=IN.l.filter(match),n=function(s){return IN.l.filter(function(o){return s==='all'||(s==='todo'?TODO.indexOf(o.status)>-1:o.status===s)}).length};
+  var RST=rstT(),af=function(o){return !RST||new Date(o.created_at).getTime()>=RST};var td=IN.l.filter(function(o){return sameDay(o.created_at)&&o.status!=='annulée'&&af(o)}),ca=td.reduce(function(a,o){return a+(+o.total||0)},0);
+  var all=IN.l.filter(function(o){return o.status!=='annulée'&&af(o)}).reduce(function(a,o){return a+(+o.total||0)},0);
+  var chip=function(k,l,c){return'<button class="cat '+(IN.f===k?'on':'')+'" data-inf="'+k+'">'+l+' ('+c+')</button>'};
+  aShow('<h2>📥 Commandes reçues</h2>'+(sb?'':'<p class="note" style="text-align:left">⚠️ Aperçu : commandes de démonstration.</p>')
+  +'<div class="ost"><div><b>'+n('todo')+'</b><small>À traiter</small></div><div><b>'+td.length+'</b><small>Aujourd’hui · '+eur(ca)+'</small></div><div><b>'+eur(all)+'</b><small>Total (hors annulées)</small></div></div>'
+  +'<div style="text-align:center;margin:-4px 0 8px">'+(RST?'<div class="note" style="margin:0 0 4px">Compteurs remis à 0 le '+new Date(RST).toLocaleDateString('fr-FR')+' à '+new Date(RST).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' · tes commandes sont toujours là</div>':'')+'<button class="cat" data-ordrst="1">'+(IN.rp?'⚠️ Appuie encore pour confirmer':'↺ Remettre le total à 0')+'</button>'+(RST?' <button class="cat" data-ordrst="x">Tout recompter</button>':'')+'</div>'
+  +'<input id="inq" placeholder="🔍 Nom, téléphone, ville, produit, n°" value="'+esc(IN.q)+'">'
+  +'<div class="chips" style="margin:6px 0 10px">'+chip('todo','🔥 À traiter',n('todo'))+chip('all','Toutes',n('all'))+OST.map(function(s){return chip(s,s,n(s))}).join('')+'</div>'
+  +'<button class="btn alt" data-inrf style="margin:0 0 10px">↻ Actualiser</button>'
+  +'<div id="inl">'+(L.map(inCard).join('')||'<div class="empty">Aucune commande ici 🎉</div>')+'</div><button class="btn alt" data-cfgback>← Retour</button>');
+  if(focus){var el=$('#o'+focus);if(el){el.open=true;IN.op[focus]=true;el.scrollIntoView();el.style.boxShadow='0 0 0 2px var(--glow)'}}};
+ if(IN.f==='all')IN.f='todo';
+ document.addEventListener('input',function(e){if(e.target&&e.target.id==='inq'){e.stopImmediatePropagation();IN.q=e.target.value;var L=IN.l.filter(match);$('#inl').innerHTML=L.map(inCard).join('')||'<div class="empty">Aucune commande ici 🎉</div>'}},true);
+ document.addEventListener('toggle',function(e){var d=e.target;if(d&&d.classList&&d.classList.contains('ocd'))IN.op[d.dataset.oid]=d.open},true);
+ document.addEventListener('click',function(e){var t=e.target,x;
+  if(x=t.closest&&t.closest('[data-ino]')){var o=IN.l.find(function(y){return String(y.id)===x.dataset.ino});if(o&&NXT[o.status]){IN.cx=null;IN.op[o.id]=true;inStatus(o.id,FLOW[FLOW.indexOf(o.status)+1])}return}
+  if(x=t.closest&&t.closest('[data-inx]')){var id=x.dataset.inx;if(IN.cx===id){IN.cx=null;inStatus(id,'annulée')}else{IN.cx=id;IN.op[id]=true;inDraw()}return}
+ },true);
 })();
 </script>
 <style id="trkcss">
